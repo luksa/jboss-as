@@ -22,7 +22,6 @@
 
 package org.jboss.as.web;
 
-import org.apache.catalina.connector.Connector;
 import org.jboss.as.controller.BasicOperationResult;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationResult;
@@ -52,6 +51,8 @@ import org.jboss.as.server.services.net.SocketBinding;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
+
+import org.mortbay.jetty.Connector;
 
 /**
  * {@code OperationHandler} responsible for adding a web connector.

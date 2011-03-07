@@ -22,35 +22,23 @@
 
 package org.jboss.as.web.deployment;
 
-import org.apache.catalina.Host;
-import org.apache.catalina.Loader;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.startup.ContextConfig;
-import org.apache.tomcat.InstanceManager;
-import org.jboss.as.ee.naming.NamespaceSelectorService;
-import org.jboss.as.naming.context.NamespaceContextSelector;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
-import org.jboss.as.web.NamingListener;
+import org.jboss.as.web.WebServer;
 import org.jboss.as.web.WebSubsystemServices;
-import org.jboss.as.web.security.JBossWebRealm;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.security.AuthenticationManager;
-import org.jboss.security.AuthorizationManager;
-import org.jboss.security.SecurityConstants;
 import org.jboss.vfs.VirtualFile;
+import org.mortbay.jetty.webapp.Configuration;
+import org.mortbay.jetty.webapp.JettyWebXmlConfiguration;
+import org.mortbay.jetty.webapp.WebAppContext;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -104,22 +92,17 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
 
         // Create the context
-        final StandardContext webContext = new StandardContext();
-        final ContextConfig config = new JBossContextConfig(deploymentUnit);
-
-        webContext.addInstanceListener(NamingListener.class.getName());
-
-        // Set the deployment root
-        try {
-            webContext.setDocBase(deploymentRoot.getPhysicalFile().getAbsolutePath());
-        } catch (IOException e) {
-            throw new DeploymentUnitProcessingException(e);
-        }
-        webContext.addLifecycleListener(config);
+        final WebAppContext webContext = new WebAppContext();
+        webContext.setBaseResource(new VFSResource(deploymentRoot));
+        webContext.setWar(deploymentRoot.getPathName());
+        webContext.setExtractWAR(false);
+        webContext.setClassLoader(classLoader);
+        JBossWebConfiguration jwc = new JBossWebConfiguration(metaData);
+        webContext.setConfigurations(new Configuration[]{jwc, new JettyWebXmlConfiguration()});
 
         // Set the path name
         final String deploymentName = deploymentUnit.getName();
-        String pathName = null;
+        String pathName;
         if (metaData.getContextRoot() == null) {
             pathName = deploymentRoot.getName();
             if (pathName.equals("ROOT.war")) {
@@ -133,77 +116,15 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
                 pathName = "";
             }
         }
-        webContext.setPath(pathName);
-        webContext.setIgnoreAnnotations(true);
-        if (!metaData.isDisableCrossContext()) {
-            webContext.setCrossContext(true);
-        }
-
-        //
-        final Loader loader = new WebCtxLoader(classLoader);
-        final InstanceManager manager = new WebInjectionContainer(classLoader);
-        webContext.setInstanceManager(manager);
-        webContext.setLoader(loader);
-
-        // Set the session cookies flag according to metadata
-        switch (metaData.getSessionCookies()) {
-            case JBossWebMetaData.SESSION_COOKIES_ENABLED:
-                webContext.setCookies(true);
-                break;
-            case JBossWebMetaData.SESSION_COOKIES_DISABLED:
-                webContext.setCookies(false);
-                break;
-        }
-
-        String metaDataSecurityDomain = metaData.getSecurityDomain();
-        if (metaDataSecurityDomain != null) {
-            metaDataSecurityDomain = metaDataSecurityDomain.trim();
-        }
-
-        // Get the realm details from the domain model
-        JBossWebRealm realm = new JBossWebRealm();
-        String securityDomain = metaDataSecurityDomain == null ? SecurityConstants.DEFAULT_APPLICATION_POLICY
-                : metaDataSecurityDomain;
-
-        // Set the current tccl and save it
-        ClassLoader tcl = SecurityActions.getContextClassLoader();
-        // Set the Module Class loader as the tccl such that the JNDI lookup of the JBoss Authentication/Authz managers succeed
-        SecurityActions.setContextClassLoader(classLoader);
+        webContext.setContextPath(pathName);
 
         try {
-            AuthenticationManager authM = getAuthenticationManager(securityDomain);
-            realm.setAuthenticationManager(authM);
-
-            AuthorizationManager authzM = getAuthorizationManager(securityDomain);
-            realm.setAuthorizationManager(authzM);
-
-            webContext.setRealm(realm);
-        } catch (NamingException e1) {
-            throw new RuntimeException(e1);
-        } finally {
-                SecurityActions.setContextClassLoader(tcl);
-        }
-
-        try {
-            ServiceName namespaceSelectorServiceName = deploymentUnit.getServiceName().append(NamespaceSelectorService.NAME);
             WebDeploymentService webDeploymentService = new WebDeploymentService(webContext);
-            serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService).addDependency(
-                    WebSubsystemServices.JBOSS_WEB_HOST.append(hostName), Host.class, new WebContextInjector(webContext))
-                    .addDependency(namespaceSelectorServiceName, NamespaceContextSelector.class,
-                            webDeploymentService.getNamespaceSelector()).setInitialMode(Mode.ACTIVE).install();
+            serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService)
+                    .addDependency(WebSubsystemServices.JBOSS_WEB, WebServer.class, webDeploymentService.getWebServer())
+                    .setInitialMode(Mode.ACTIVE).install();
         } catch (ServiceRegistryException e) {
             throw new DeploymentUnitProcessingException("Failed to add JBoss web deployment service", e);
         }
     }
-
-    private AuthenticationManager getAuthenticationManager(String secDomain) throws NamingException {
-        InitialContext ic = new InitialContext();
-        return (AuthenticationManager) ic.lookup(SecurityConstants.JAAS_CONTEXT_ROOT + "/" + secDomain + "/authenticationMgr");
-    }
-
-    private AuthorizationManager getAuthorizationManager(String secDomain) throws NamingException {
-        InitialContext ic = new InitialContext();
-        return (AuthorizationManager) ic.lookup(SecurityConstants.JAAS_CONTEXT_ROOT + "/" + secDomain + "/authorizationMgr");
-    }
-
 }

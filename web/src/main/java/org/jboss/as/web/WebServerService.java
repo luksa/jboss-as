@@ -21,96 +21,59 @@
  */
 package org.jboss.as.web;
 
-import javax.management.MBeanServer;
-
-import org.apache.catalina.Engine;
-import org.apache.catalina.Host;
-import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.ServiceMapperListener;
-import org.apache.catalina.core.StandardEngine;
-import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.core.StandardService;
-import org.apache.catalina.startup.Catalina;
-import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.mortbay.jetty.handler.DefaultHandler;
+import org.mortbay.jetty.handler.HandlerCollection;
+import org.mortbay.jetty.handler.RequestLogHandler;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * Service configuring and starting the web container.
  *
  * @author Emanuel Muckenhuber
+ * @author Ales Justin
  */
 class WebServerService implements WebServer, Service<WebServer> {
 
-    private static final String JBOSS_WEB = "jboss.web";
+    private Server server;
+    private ContextHandlerCollection contexts;
 
-    private final String defaultHost;
-
-    private Engine engine;
-    private Catalina catalina;
-    private StandardService service;
-
-    private final InjectedValue<MBeanServer> mbeanServer = new InjectedValue<MBeanServer>();
-    private final InjectedValue<String> pathInjector = new InjectedValue<String>();
-
-    public WebServerService(final String defaultHost) {
-        this.defaultHost = defaultHost != null ? defaultHost : "localhost";
-    }
+    private final InjectedValue<Integer> portInjector = new InjectedValue<Integer>();
 
     /** {@inheritDoc} */
     public synchronized void start(StartContext context) throws StartException {
-        // Set the MBeanServer
-        final MBeanServer mbeanServer = this.mbeanServer.getOptionalValue();
-        if(mbeanServer != null) {
-            getRegistry().setMBeanServer(mbeanServer);
-        }
+        Integer port = portInjector.getOptionalValue();
+        if (port == null)
+            port = 8080;
+        server = new Server(port);
 
-        final Catalina catalina = new Catalina();
-        catalina.setCatalinaHome(pathInjector.getValue());
-
-        final StandardServer server = new StandardServer();
-        catalina.setServer(server);
-
-        final StandardService service = new StandardService();
-        service.setName(JBOSS_WEB);
-        service.setServer(server);
-        server.addService(service);
-
-        final Engine engine = new StandardEngine();
-        engine.setName(JBOSS_WEB);
-        engine.setService(service);
-        engine.setDefaultHost(defaultHost);
-
-        service.setContainer(engine);
-
-        // final AprLifecycleListener apr = new AprLifecycleListener();
-        //apr.setSSLEngine("on");
-        // server.addLifecycleListener(apr);
-        // server.addLifecycleListener(new JasperListener());
+        HandlerCollection handlers = new HandlerCollection();
+        contexts = new ContextHandlerCollection();
+        handlers.addHandler(contexts);
+        handlers.addHandler(new DefaultHandler());
+        // handlers.addHandler(new RequestLogHandler());
+        server.setHandler(handlers);
 
         try {
-            catalina.create();
-            server.initialize();
-            catalina.start();
+            server.start();
         } catch (Exception e) {
             throw new StartException(e);
         }
-        this.catalina = catalina;
-        this.service = service;
-        this.engine = engine;
     }
 
     /** {@inheritDoc} */
     public synchronized void stop(StopContext context) {
-        catalina.stop();
-        catalina.destroy();
-        engine = null;
-        service = null;
-        catalina = null;
+        try {
+            server.stop();
+        } catch (Exception ignored) {
+        }
     }
 
     /** {@inheritDoc} */
@@ -120,50 +83,30 @@ class WebServerService implements WebServer, Service<WebServer> {
 
     /** {@inheritDoc} */
     public synchronized void addConnector(Connector connector) {
-        final StandardService service = this.service;
-        service.addConnector(connector);
+        server.addConnector(connector);
     }
 
     /** {@inheritDoc} */
     public synchronized void removeConnector(Connector connector) {
-        final StandardService service = this.service;
-        service.removeConnector(connector);
+        server.removeConnector(connector);
     }
 
-    /** {@inheritDoc} */
-    public synchronized void addHost(Host host) {
-        final Engine engine = this.engine;
-        engine.addChild(host);
-        // FIXME: Hack, remove with next JBW build
-        for (LifecycleListener listener : service.findLifecycleListeners()) {
-            if (listener instanceof ServiceMapperListener) {
-                host.addContainerListener((ServiceMapperListener) listener);
-            }
+    @Override
+    public void addWebAppContext(WebAppContext context) {
+        try {
+            contexts.addHandler(context);
+            contexts.mapContexts();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
-    /** {@inheritDoc} */
-    public synchronized void removeHost(Host host) {
-        final Engine engine = this.engine;
-        engine.removeChild(host);
-        // FIXME: Hack, remove with next JBW build
-        for (LifecycleListener listener : service.findLifecycleListeners()) {
-            if (listener instanceof ServiceMapperListener) {
-                host.removeContainerListener((ServiceMapperListener) listener);
-            }
-        }
+    @Override
+    public void removeWebAppContext(WebAppContext context) {
+        contexts.removeHandler(context);
     }
 
-    InjectedValue<MBeanServer> getMbeanServer() {
-        return mbeanServer;
+    InjectedValue<Integer> getPortInjector() {
+        return portInjector;
     }
-
-    InjectedValue<String> getPathInjector() {
-        return pathInjector;
-    }
-
-    Registry getRegistry() {
-        return Registry.getRegistry(null, null);
-    }
-
 }

@@ -21,13 +21,14 @@
  */
 package org.jboss.as.web;
 
-import org.apache.catalina.Host;
-import org.apache.catalina.connector.Connector;
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * The web server.
  *
  * @author Emanuel Muckenhuber
+ * @author Ales Justin
  */
 public interface WebServer {
 
@@ -45,18 +46,7 @@ public interface WebServer {
      */
     void removeConnector(Connector connector);
 
-    /**
-     * Add a virtual host.
-     *
-     * @param host the virtual host
-     */
-    void addHost(Host host);
+    void addWebAppContext(WebAppContext context);
 
-    /**
-     * Remove a virtual host.
-     *
-     * @param host the virtual host
-     */
-    void removeHost(Host host);
-
+    void removeWebAppContext(WebAppContext context);
 }

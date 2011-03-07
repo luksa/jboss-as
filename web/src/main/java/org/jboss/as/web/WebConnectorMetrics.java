@@ -38,14 +38,13 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.as.controller.ModelQueryOperationHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ResultHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
+import org.mortbay.jetty.Connector;
 
 /**
  * @author Emanuel Muckenhuber
@@ -76,7 +75,7 @@ class WebConnectorMetrics implements ModelQueryOperationHandler {
                             final Connector connector = (Connector) controller.getValue();
                             final int port = connector.getPort();
                             final ModelNode result = new ModelNode();
-                            result.set("" + getAttribute("http-" + port, attributeName));
+                            result.set("TODO, port: " + port);
                             resultHandler.handleResultFragment(new String[0], result);
                             resultHandler.handleResultComplete();
                         } catch (Exception e) {
@@ -91,19 +90,4 @@ class WebConnectorMetrics implements ModelQueryOperationHandler {
         }
         return new BasicOperationResult();
     }
-
-    static final ObjectName createObjectName(final String name) throws MalformedObjectNameException {
-        return new ObjectName(BASE_NAME + name);
-    }
-
-    static final Object getAttribute(final String name, final String attributeName) throws MalformedObjectNameException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
-        final ObjectName connectorName = createObjectName(name);
-        final Object value = getMBeanServer().getAttribute(connectorName, attributeName);
-        return value;
-    }
-
-    static MBeanServer getMBeanServer() {
-        return Registry.getRegistry(null, null).getMBeanServer();
-    }
-
 }

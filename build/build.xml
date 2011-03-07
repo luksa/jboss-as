@@ -463,8 +463,8 @@
 
         <module-def name="org.jboss.as.web">
             <maven-resource group="org.jboss.as" artifact="jboss-as-web"/>
-            <maven-resource group="org.jboss.web" artifact="jasper-jdt"/>
-            <maven-resource group="org.jboss.web" artifact="jbossweb"/>
+            <maven-resource group="org.mortbay.jetty" artifact="jetty"/>
+            <maven-resource group="org.mortbay.jetty" artifact="jetty-util"/>
         </module-def>
 
         <module-def name="org.jboss.as.webservices">

@@ -21,78 +21,61 @@
  */
 package org.jboss.as.web.deployment;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.StandardContext;
-import org.jboss.as.naming.context.NamespaceContextSelector;
-import org.jboss.as.web.NamingListener;
+import org.jboss.as.web.WebServer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.jboss.msc.value.Value;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * A service starting a web deployment.
  *
  * @author Emanuel Muckenhuber
  */
-class WebDeploymentService implements Service<Context> {
+class WebDeploymentService implements Service<WebAppContext> {
 
     private static final Logger log = Logger.getLogger("org.jboss.web");
-    private final StandardContext context;
-    private final InjectedValue<NamespaceContextSelector> namespaceSelector = new InjectedValue<NamespaceContextSelector>();
+    private final WebAppContext context;
+    private final InjectedValue<WebServer> webServer = new InjectedValue<WebServer>();
 
-    public WebDeploymentService(final StandardContext context) {
+    public WebDeploymentService(final WebAppContext context) {
         this.context = context;
     }
 
     /** {@inheritDoc} */
     public synchronized void start(StartContext startContext) throws StartException {
-        try {
-            NamingListener.beginComponentStart(namespaceSelector.getValue());
             try {
-                context.create();
-            } catch (Exception e) {
-                throw new StartException("failed to create context", e);
-            }
-            try {
+                webServer.getValue().addWebAppContext(context);
                 context.start();
-            } catch (LifecycleException e) {
+            } catch (Exception e) {
                 throw new StartException("failed to start context", e);
             }
-            log.info("registering web context: " + context.getName());
-        } finally {
-            NamingListener.endComponentStart();
-        }
     }
 
     /** {@inheritDoc} */
     public synchronized void stop(StopContext stopContext) {
         try {
             context.stop();
-        } catch (LifecycleException e) {
-            log.error("exception while stopping context", e);
-        }
-        try {
-            context.destroy();
+            webServer.getValue().removeWebAppContext(context);
         } catch (Exception e) {
-            log.error("exception while destroying context", e);
+            log.error("exception while stopping context", e);
         }
     }
 
     /** {@inheritDoc} */
-    public synchronized Context getValue() throws IllegalStateException {
-        final Context context = this.context;
+    public synchronized WebAppContext getValue() throws IllegalStateException {
+        final WebAppContext context = this.context;
         if (context == null) {
             throw new IllegalStateException();
         }
         return context;
     }
 
-    public InjectedValue<NamespaceContextSelector> getNamespaceSelector() {
-        return namespaceSelector;
+    InjectedValue<WebServer> getWebServer() {
+        return webServer;
     }
-
 }

@@ -64,10 +64,6 @@ public class WebExtension implements Extension {
         for(final String attributeName : WebConnectorMetrics.ATTRIBUTES) {
             connectors.registerMetric(attributeName, WebConnectorMetrics.INSTANCE);
         }
-        //hosts
-        final ModelNodeRegistration hosts = registration.registerSubModel(hostPath, WebSubsystemProviders.HOST);
-        hosts.registerOperationHandler(ADD, WebVirtualHostAdd.INSTANCE, WebSubsystemProviders.HOST_ADD, false);
-        hosts.registerOperationHandler(REMOVE, WebVirtualHostRemove.INSTANCE, WebSubsystemProviders.HOST_REMOVE, false);
     }
 
     /** {@inheritDoc} */

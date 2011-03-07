@@ -23,23 +23,16 @@
 package org.jboss.as.web;
 
 import org.jboss.as.controller.BasicOperationResult;
-import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.OperationResult;
-import org.jboss.as.controller.RuntimeTask;
-import org.jboss.as.controller.RuntimeTaskContext;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
-
-import javax.management.MBeanServer;
-
 import org.jboss.as.controller.ModelAddOperationHandler;
 import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.OperationResult;
 import org.jboss.as.controller.ResultHandler;
+import org.jboss.as.controller.RuntimeTask;
+import org.jboss.as.controller.RuntimeTaskContext;
 import org.jboss.as.server.BootOperationContext;
 import org.jboss.as.server.BootOperationHandler;
 import org.jboss.as.server.deployment.Phase;
-import org.jboss.as.server.services.path.AbstractPathService;
 import org.jboss.as.web.deployment.JBossWebParsingDeploymentProcessor;
 import org.jboss.as.web.deployment.ServletContainerInitializerDeploymentProcessor;
 import org.jboss.as.web.deployment.TldParsingDeploymentProcessor;
@@ -52,9 +45,11 @@ import org.jboss.as.web.deployment.WarStructureDeploymentProcessor;
 import org.jboss.as.web.deployment.WebFragmentParsingDeploymentProcessor;
 import org.jboss.as.web.deployment.WebParsingDeploymentProcessor;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.service.ServiceName;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
 /**
  * Adds the web subsystem.
@@ -65,7 +60,6 @@ class WebSubsystemAdd implements ModelAddOperationHandler, BootOperationHandler 
 
     static final WebSubsystemAdd INSTANCE = new WebSubsystemAdd();
     private static final String DEFAULT_HOST = "localhost";
-    private static final String TEMP_DIR = "jboss.server.temp.dir";
 
     private WebSubsystemAdd() {
         //
@@ -89,10 +83,8 @@ class WebSubsystemAdd implements ModelAddOperationHandler, BootOperationHandler 
                             operation.get(CommonAttributes.DEFAULT_HOST).asString() : DEFAULT_HOST;
 
                     try {
-                        final WebServerService service = new WebServerService(defaultHost);
+                        final WebServerService service = new WebServerService();
                         context.getServiceTarget().addService(WebSubsystemServices.JBOSS_WEB, service)
-                                .addDependency(AbstractPathService.pathNameOf(TEMP_DIR), String.class, service.getPathInjector())
-                                .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class, service.getMbeanServer())
                                 .setInitialMode(Mode.ON_DEMAND)
                                 .install();
                     } catch (Throwable t) {

@@ -21,16 +21,17 @@
  */
 package org.jboss.as.web;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executor;
-
-import org.apache.catalina.connector.Connector;
 import org.jboss.as.server.services.net.SocketBinding;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executor;
 
 /**
  * Service creating and starting a web connector.
@@ -72,19 +73,9 @@ class WebConnectorService implements Service<Connector> {
         final InetSocketAddress address = binding.getSocketAddress();
         try {
             // Create connector
-            final Connector connector = new Connector();
+            final SelectChannelConnector connector = new SelectChannelConnector();
             connector.setPort(address.getPort());
-            connector.setProtocol(protocol);
-            connector.setScheme(scheme);
-            if(enableLookups != null) connector.setEnableLookups(enableLookups);
-            if(maxPostSize != null) connector.setMaxPostSize(maxPostSize);
-            if(maxSavePostSize != null) connector.setMaxSavePostSize(maxSavePostSize);
-            if(proxyName != null) connector.setProxyName(proxyName);
-            if(proxyPort != null) connector.setProxyPort(proxyPort);
-            if(redirectPort != null) connector.setRedirectPort(redirectPort);
-            if(secure != null) connector.setSecure(secure);
-            // TODO set Executor on ProtocolHandler
-            // TODO use server socket factory - or integrate with {@code ManagedBinding}
+            connector.setHost("localhost");
 
             // Register connector, starts the connector automatically?
             getWebServer().addConnector(connector);

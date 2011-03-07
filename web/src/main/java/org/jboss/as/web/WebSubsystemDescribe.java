@@ -64,13 +64,6 @@ class WebSubsystemDescribe implements ModelQueryOperationHandler {
                 result.add(WebConnectorAdd.getRecreateOperation(address, connector.getValue()));
             }
         }
-        if(subModel.hasDefined(CommonAttributes.VIRTUAL_SERVER)) {
-            for(final Property host : subModel.get(CommonAttributes.VIRTUAL_SERVER).asPropertyList()) {
-                final ModelNode address = rootAddress.toModelNode();
-                address.add(CommonAttributes.VIRTUAL_SERVER, host.getName());
-                result.add(WebVirtualHostAdd.getAddOperation(address, host.getValue()));
-            }
-        }
 
         resultHandler.handleResultFragment(Util.NO_LOCATION, result);
         resultHandler.handleResultComplete();
