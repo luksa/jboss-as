@@ -22,18 +22,34 @@
 
 package org.jboss.as.web.deployment;
 
+import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.web.jboss.JBossServletMetaData;
 import org.jboss.metadata.web.jboss.JBossServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
+import org.jboss.metadata.web.spec.DispatcherType;
+import org.jboss.metadata.web.spec.ErrorPageMetaData;
+import org.jboss.metadata.web.spec.FilterMappingMetaData;
+import org.jboss.metadata.web.spec.FilterMetaData;
+import org.jboss.metadata.web.spec.FiltersMetaData;
+import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
+import org.jboss.metadata.web.spec.SessionConfigMetaData;
+import org.jboss.metadata.web.spec.WelcomeFileListMetaData;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.servlet.ErrorPageErrorHandler;
+import org.mortbay.jetty.servlet.FilterHolder;
+import org.mortbay.jetty.servlet.FilterMapping;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.ServletMapping;
 import org.mortbay.jetty.webapp.Configuration;
 import org.mortbay.jetty.webapp.WebAppContext;
 
+import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Custom JBossAS web configuration.
@@ -68,10 +84,98 @@ public class JBossWebConfiguration implements Configuration {
     public void configureDefaults() throws Exception {
     }
 
+    @SuppressWarnings({"unchecked"})
     @Override
     public void configureWebApp() throws Exception {
 
         ServletHandler servletHandler = getWebAppContext().getServletHandler();
+
+        // Display name
+        DescriptionGroupMetaData dg = metaData.getDescriptionGroup();
+        if (dg != null) {
+            String displayName = dg.getDisplayName();
+            if (displayName != null) {
+                getWebAppContext().setDisplayName(displayName);
+            }
+        }
+
+        // Distributable
+        if (metaData.getDistributable() != null)
+            getWebAppContext().setDistributable(true);
+
+        // Context params
+        List<ParamValueMetaData> contextParams = metaData.getContextParams();
+        if (contextParams != null) {
+            for (ParamValueMetaData param : contextParams) {
+                getWebAppContext().getInitParams().put(param.getParamName(), param.getParamValue());
+            }
+        }
+
+        // Error pages
+        List<ErrorPageMetaData> errorPages = metaData.getErrorPages();
+        if (errorPages != null) {
+            Map<String, String> errors = new HashMap<String, String>();
+            for (ErrorPageMetaData value : errorPages) {
+                String error = value.getErrorCode();
+                if (error == null || error.length() == 0)
+                    error = value.getExceptionType();
+                String location = value.getLocation();
+                errors.put(error, location);
+            }
+            if (getWebAppContext().getErrorHandler() instanceof ErrorPageErrorHandler)
+                ((ErrorPageErrorHandler) getWebAppContext().getErrorHandler()).setErrorPages(errors);
+        }
+
+        // Filter definitions
+        FiltersMetaData filters = metaData.getFilters();
+        if (filters != null) {
+            for (FilterMetaData value : filters) {
+                FilterHolder filterHolder = new FilterHolder();
+                filterHolder.setName(value.getFilterName());
+                filterHolder.setClassName(value.getFilterClass());
+                if (value.getInitParam() != null)
+                    for (ParamValueMetaData param : value.getInitParam()) {
+                        filterHolder.setInitParameter(param.getParamName(), param.getParamValue());
+                    }
+                servletHandler.addFilter(filterHolder);
+            }
+        }
+
+        // Filter mappings
+        List<FilterMappingMetaData> filtersMappings = metaData.getFilterMappings();
+        if (filtersMappings != null) {
+            for (FilterMappingMetaData value : filtersMappings) {
+                FilterMapping filterMapping = new FilterMapping();
+                filterMapping.setFilterName(value.getFilterName());
+                List<String> servletNames = value.getServletNames();
+                if (servletNames != null) {
+                    filterMapping.setServletNames(servletNames.toArray(new String[servletNames.size()]));
+                }
+                List<String> urlPatterns = value.getUrlPatterns();
+                if (urlPatterns != null) {
+                    filterMapping.setPathSpecs(urlPatterns.toArray(new String[urlPatterns.size()]));
+                }
+                List<DispatcherType> dispatchers = value.getDispatchers();
+                if (dispatchers != null) {
+                    int dispatch = Handler.DEFAULT;
+                    for (DispatcherType type : dispatchers)
+                        dispatch |= type.ordinal();
+                    filterMapping.setDispatches(dispatch);
+                }
+                servletHandler.addFilterMapping(filterMapping);
+            }
+        }
+
+        // Listeners
+        List<ListenerMetaData> listeners = metaData.getListeners();
+        if (listeners != null) {
+            EventListener[] eventListeners = new EventListener[listeners.size()];
+            int i = 0;
+            for (ListenerMetaData value : listeners) {
+                eventListeners[i] = newInstance(value.getListenerClass());
+            }
+            getWebAppContext().setEventListeners(eventListeners);
+        }
 
         // Servlet
         JBossServletsMetaData servlets = metaData.getServlets();
@@ -103,9 +207,33 @@ public class JBossWebConfiguration implements Configuration {
                 }
             }
         }
+
+        // Welcome files
+        WelcomeFileListMetaData welcomeFiles = metaData.getWelcomeFileList();
+        if (welcomeFiles != null) {
+            List<String> files = welcomeFiles.getWelcomeFiles();
+            if (files != null)
+                getWebAppContext().setWelcomeFiles(files.toArray(new String[files.size()]));
+        }
+
+        // Session timeout
+        SessionConfigMetaData scmd = metaData.getSessionConfig();
+        if (scmd != null) {
+            int timeout = scmd.getSessionTimeout();
+            getWebAppContext().getSessionHandler().getSessionManager().setMaxInactiveInterval(timeout * 60);
+        }
     }
 
     @Override
     public void deconfigureWebApp() throws Exception {
+    }
+
+    @SuppressWarnings({"unchecked"})
+    protected <T> T newInstance(String className) throws Exception {
+        return (T) newInstance(getWebAppContext().loadClass(className));
+    }
+
+    protected <T> T newInstance(Class<T> clazz) throws Exception {
+        return clazz.newInstance();
     }
 }
