@@ -25,6 +25,7 @@ package org.jboss.as.web.deployment;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.merge.web.jboss.JBossWebMetaDataMerger;
 import org.jboss.metadata.web.jboss.JBossServletMetaData;
 import org.jboss.metadata.web.jboss.JBossServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -49,6 +50,8 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.ServletMapping;
 import org.mortbay.jetty.webapp.WebXmlConfiguration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
@@ -62,10 +65,10 @@ import java.util.Map;
  */
 public class JBossWebConfiguration extends WebXmlConfiguration {
 
-    private JBossWebMetaData metaData;
+    private WarMetaData warMetaData;
 
-    public JBossWebConfiguration(JBossWebMetaData metaData) {
-        this.metaData = metaData;
+    public JBossWebConfiguration(WarMetaData warMetaData) {
+        this.warMetaData = warMetaData;
     }
 
     @Override
@@ -73,10 +76,23 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
         // do nothing, we already set this in processor
     }
 
-    @SuppressWarnings({"unchecked"})
+    @Override
+    public void configureDefaults() throws Exception {
+        // let override it for the moment -- see SharedWebMetaDataBuilder
+        // default
+        JBossWebMetaData sharedWebMetaData = new JBossWebMetaData();
+        JBossWebMetaDataMerger.merge(sharedWebMetaData, null, warMetaData.getSharedWebMetaData());
+        processWebMetaData(sharedWebMetaData);
+    }
+
     @Override
     public void configureWebApp() throws Exception {
+        // custom
+        processWebMetaData(warMetaData.getMergedJBossWebMetaData());
+    }
 
+    @SuppressWarnings({"unchecked"})
+    protected void processWebMetaData(JBossWebMetaData metaData) throws Exception {
         ServletHandler servletHandler = getWebAppContext().getServletHandler();
 
         // Display name
@@ -158,12 +174,15 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
         // Listeners
         List<ListenerMetaData> listeners = metaData.getListeners();
         if (listeners != null) {
-            EventListener[] eventListeners = new EventListener[listeners.size()];
-            int i = 0;
+            List<EventListener> eventListeners = new ArrayList<EventListener>();
+            EventListener[] previous = getWebAppContext().getEventListeners();
+            if (previous != null)
+                eventListeners.addAll(Arrays.asList(previous));
+
             for (ListenerMetaData value : listeners) {
-                eventListeners[i] = newInstance(value.getListenerClass());
+                eventListeners.add((EventListener) newInstance(value.getListenerClass()));
             }
-            getWebAppContext().setEventListeners(eventListeners);
+            getWebAppContext().setEventListeners(eventListeners.toArray(new EventListener[eventListeners.size()]));
         }
 
         // Login configuration

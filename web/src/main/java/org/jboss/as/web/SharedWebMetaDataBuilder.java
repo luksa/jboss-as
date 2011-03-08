@@ -21,16 +21,10 @@
  */
 package org.jboss.as.web;
 
-import org.jboss.metadata.web.spec.ListenerMetaData;
-import static org.jboss.as.web.CommonAttributes.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
+import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.MimeMappingMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
@@ -39,6 +33,40 @@ import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
 import org.jboss.metadata.web.spec.WelcomeFileListMetaData;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.jboss.as.web.CommonAttributes.CHECK_INTERVAL;
+import static org.jboss.as.web.CommonAttributes.DEVELOPMENT;
+import static org.jboss.as.web.CommonAttributes.DISABLED;
+import static org.jboss.as.web.CommonAttributes.DISPLAY_SOURCE_FRAGMENT;
+import static org.jboss.as.web.CommonAttributes.DUMP_SMAP;
+import static org.jboss.as.web.CommonAttributes.ERROR_ON_USE_BEAN_INVALID_CLASS_ATTRIBUTE;
+import static org.jboss.as.web.CommonAttributes.FILE_ENCONDING;
+import static org.jboss.as.web.CommonAttributes.GENERATE_STRINGS_AS_CHAR_ARRAYS;
+import static org.jboss.as.web.CommonAttributes.JAVA_ENCODING;
+import static org.jboss.as.web.CommonAttributes.JSP_CONFIGURATION;
+import static org.jboss.as.web.CommonAttributes.KEEP_GENERATED;
+import static org.jboss.as.web.CommonAttributes.LISTINGS;
+import static org.jboss.as.web.CommonAttributes.MAPPED_FILE;
+import static org.jboss.as.web.CommonAttributes.MAX_DEPTH;
+import static org.jboss.as.web.CommonAttributes.MODIFIFICATION_TEST_INTERVAL;
+import static org.jboss.as.web.CommonAttributes.READ_ONLY;
+import static org.jboss.as.web.CommonAttributes.RECOMPILE_ON_FAIL;
+import static org.jboss.as.web.CommonAttributes.SCRATCH_DIR;
+import static org.jboss.as.web.CommonAttributes.SECRET;
+import static org.jboss.as.web.CommonAttributes.SENDFILE;
+import static org.jboss.as.web.CommonAttributes.SMAP;
+import static org.jboss.as.web.CommonAttributes.SOURCE_VM;
+import static org.jboss.as.web.CommonAttributes.STATIC_RESOURCES;
+import static org.jboss.as.web.CommonAttributes.TAG_POOLING;
+import static org.jboss.as.web.CommonAttributes.TARGET_VM;
+import static org.jboss.as.web.CommonAttributes.TRIM_SPACES;
+import static org.jboss.as.web.CommonAttributes.WEBDAV;
+import static org.jboss.as.web.CommonAttributes.X_POWERED_BY;
+
 /**
  * Internal helper creating a shared web.xml based on the domain configuration.
  *
@@ -46,7 +74,7 @@ import org.jboss.metadata.web.spec.WelcomeFileListMetaData;
  */
 class SharedWebMetaDataBuilder {
 
-    static final List<String> welcomeFiles = Arrays.asList(new String[] {"index.html", "index.htm", "index.jsp"});
+    static final List<String> welcomeFiles = Arrays.asList("index.html", "index.htm", "index.jsp");
     static final List<MimeMappingMetaData> mimeMappings = new ArrayList<MimeMappingMetaData>();
 
     static {
@@ -83,7 +111,7 @@ class SharedWebMetaDataBuilder {
         // Add DefaultServlet
         enableStaticResouces(metadata);
         // Add JSPServlet
-        enableJsp(metadata);
+        // enableJsp(metadata); // TODO
         // Add JSF
         enableJsf(metadata);
 
@@ -115,12 +143,12 @@ class SharedWebMetaDataBuilder {
             return;
         }
         final ServletMetaData servlet = new ServletMetaData();
-        servlet.setName("DefaultServlet");
+        servlet.setName("default");
         servlet.setLoadOnStartup("" + 1);
         if (resourcesConfig.has(WEBDAV) && resourcesConfig.get(WEBDAV).asBoolean()) {
-            servlet.setServletClass("org.apache.catalina.servlets.WebdavServlet");
+            throw new UnsupportedOperationException("No such Jetty impl");
         } else {
-            servlet.setServletClass("org.apache.catalina.servlets.DefaultServlet");
+            servlet.setServletClass("org.mortbay.jetty.servlet.DefaultServlet");
         }
 
         final List<ParamValueMetaData> initParams = new ArrayList<ParamValueMetaData>();
@@ -152,7 +180,7 @@ class SharedWebMetaDataBuilder {
         }
         servlet.setInitParam(initParams);
         metadata.getServlets().add(servlet);
-        addServletMapping("DefaultServlet", metadata, "/");
+        addServletMapping("default", metadata, "/");
     }
 
 

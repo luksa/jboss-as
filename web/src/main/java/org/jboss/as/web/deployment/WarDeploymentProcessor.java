@@ -89,7 +89,6 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
             throw new DeploymentUnitProcessingException("failed to resolve module for deployment " + deploymentRoot);
         }
         final ClassLoader classLoader = module.getClassLoader();
-        final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
 
         // Create the context
         final WebAppContext webContext = new WebAppContext();
@@ -98,10 +97,11 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         webContext.setExtractWAR(false);
         webContext.setClassLoader(classLoader);
 
-        applyConfigurations(metaData, webContext);
+        applyConfigurations(warMetaData, webContext);
 
         // Set the path name
         final String deploymentName = deploymentUnit.getName();
+        JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
         String pathName;
         if (metaData.getContextRoot() == null) {
             pathName = deploymentRoot.getName();
@@ -128,7 +128,7 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         }
     }
 
-    protected void applyConfigurations(JBossWebMetaData metaData, WebAppContext webContext) {
+    protected void applyConfigurations(WarMetaData metaData, WebAppContext webContext) {
         JBossWebConfiguration jwc = new JBossWebConfiguration(metaData);
         jwc.setWebAppContext(webContext);
         JettyWebXmlConfiguration jettyWebXmlConfiguration = new JettyWebXmlConfiguration();
