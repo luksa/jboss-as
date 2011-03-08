@@ -24,6 +24,7 @@ package org.jboss.as.web.deployment;
 
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
+import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
 import org.jboss.metadata.web.jboss.JBossServletMetaData;
 import org.jboss.metadata.web.jboss.JBossServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -33,6 +34,9 @@ import org.jboss.metadata.web.spec.FilterMappingMetaData;
 import org.jboss.metadata.web.spec.FilterMetaData;
 import org.jboss.metadata.web.spec.FiltersMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
+import org.jboss.metadata.web.spec.LoginConfigMetaData;
+import org.jboss.metadata.web.spec.MimeMappingMetaData;
+import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WelcomeFileListMetaData;
@@ -175,6 +179,32 @@ public class JBossWebConfiguration implements Configuration {
                 eventListeners[i] = newInstance(value.getListenerClass());
             }
             getWebAppContext().setEventListeners(eventListeners);
+        }
+
+        // Login configuration
+        LoginConfigMetaData loginConfig = metaData.getLoginConfig();
+        if (loginConfig != null) {
+           // TODO
+        }
+
+        // MIME mappings
+        List<MimeMappingMetaData> mimes = metaData.getMimeMappings();
+        if (mimes != null) {
+            for (MimeMappingMetaData value : mimes) {
+                getWebAppContext().getMimeTypes().addMimeMapping(value.getExtension(), value.getMimeType());
+            }
+        }
+
+        // Security constraints
+        List<SecurityConstraintMetaData> scs = metaData.getSecurityConstraints();
+        if (scs != null) {
+           // TODO
+        }
+
+        // Security roles
+        SecurityRolesMetaData roles = metaData.getSecurityRoles();
+        if (roles != null) {
+           // TODO
         }
 
         // Servlet
