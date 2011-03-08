@@ -47,7 +47,6 @@ import org.jboss.metadata.web.spec.WebMetaData;
  */
 public class WebIntegrationProcessor implements DeploymentUnitProcessor {
     private final ListenerMetaData WBL;
-    private final ListenerMetaData JIL;
     private final FilterMetaData CPF;
     private final FilterMappingMetaData CPFM;
 
@@ -58,8 +57,6 @@ public class WebIntegrationProcessor implements DeploymentUnitProcessor {
         // create wbl listener
         WBL = new ListenerMetaData();
         WBL.setListenerClass("org.jboss.weld.servlet.WeldListener");
-        JIL = new ListenerMetaData();
-        JIL.setListenerClass("org.jboss.as.weld.webtier.jsp.JspInitializationListener");
         CPF = new FilterMetaData();
         CPF.setFilterName("Weld Conversation Propagation Filter");
         CPF.setFilterClass("org.jboss.weld.servlet.ConversationPropagationFilter");
@@ -97,7 +94,6 @@ public class WebIntegrationProcessor implements DeploymentUnitProcessor {
             webMetaData.setListeners(listeners);
         }
         listeners.add(0, WBL);
-        listeners.add(1, JIL);
 
         FiltersMetaData filters = webMetaData.getFilters();
         if (filters == null) {
