@@ -97,8 +97,8 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         webContext.setWar(deploymentRoot.getPathName());
         webContext.setExtractWAR(false);
         webContext.setClassLoader(classLoader);
-        JBossWebConfiguration jwc = new JBossWebConfiguration(metaData);
-        webContext.setConfigurations(new Configuration[]{jwc, new JettyWebXmlConfiguration()});
+
+        applyConfigurations(metaData, webContext);
 
         // Set the path name
         final String deploymentName = deploymentUnit.getName();
@@ -126,5 +126,13 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         } catch (ServiceRegistryException e) {
             throw new DeploymentUnitProcessingException("Failed to add JBoss web deployment service", e);
         }
+    }
+
+    protected void applyConfigurations(JBossWebMetaData metaData, WebAppContext webContext) {
+        JBossWebConfiguration jwc = new JBossWebConfiguration(metaData);
+        jwc.setWebAppContext(webContext);
+        JettyWebXmlConfiguration jettyWebXmlConfiguration = new JettyWebXmlConfiguration();
+        jettyWebXmlConfiguration.setWebAppContext(webContext);
+        webContext.setConfigurations(new Configuration[]{jwc, jettyWebXmlConfiguration});
     }
 }

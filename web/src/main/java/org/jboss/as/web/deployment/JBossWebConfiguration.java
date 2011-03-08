@@ -47,8 +47,7 @@ import org.mortbay.jetty.servlet.FilterMapping;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.ServletMapping;
-import org.mortbay.jetty.webapp.Configuration;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.mortbay.jetty.webapp.WebXmlConfiguration;
 
 import java.util.EventListener;
 import java.util.HashMap;
@@ -57,35 +56,21 @@ import java.util.Map;
 
 /**
  * Custom JBossAS web configuration.
+ * Leave defaults as they are.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class JBossWebConfiguration implements Configuration {
+public class JBossWebConfiguration extends WebXmlConfiguration {
 
     private JBossWebMetaData metaData;
-    private WebAppContext context;
 
     public JBossWebConfiguration(JBossWebMetaData metaData) {
         this.metaData = metaData;
     }
 
     @Override
-    public void setWebAppContext(WebAppContext context) {
-        this.context = context;
-    }
-
-    @Override
-    public WebAppContext getWebAppContext() {
-        return context;
-    }
-
-    @Override
     public void configureClassLoader() throws Exception {
         // do nothing, we already set this in processor
-    }
-
-    @Override
-    public void configureDefaults() throws Exception {
     }
 
     @SuppressWarnings({"unchecked"})
