@@ -21,8 +21,8 @@
  */
 package org.jboss.as.web;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * The web server.

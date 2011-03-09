@@ -463,8 +463,13 @@
 
         <module-def name="org.jboss.as.web">
             <maven-resource group="org.jboss.as" artifact="jboss-as-web"/>
-            <maven-resource group="org.mortbay.jetty" artifact="jetty"/>
-            <maven-resource group="org.mortbay.jetty" artifact="jetty-util"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-server"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-http"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-security"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-servlet"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-servlets"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-util"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-webapp"/>
         </module-def>
 
         <module-def name="org.jboss.as.webservices">

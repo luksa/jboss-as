@@ -148,7 +148,7 @@ class SharedWebMetaDataBuilder {
         if (resourcesConfig.has(WEBDAV) && resourcesConfig.get(WEBDAV).asBoolean()) {
             throw new UnsupportedOperationException("No such Jetty impl");
         } else {
-            servlet.setServletClass("org.mortbay.jetty.servlet.DefaultServlet");
+            servlet.setServletClass("org.eclipse.jetty.servlet.DefaultServlet");
         }
 
         final List<ParamValueMetaData> initParams = new ArrayList<ParamValueMetaData>();

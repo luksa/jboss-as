@@ -22,11 +22,22 @@
 
 package org.jboss.as.web;
 
+import org.eclipse.jetty.server.Connector;
 import org.jboss.as.controller.BasicOperationResult;
+import org.jboss.as.controller.ModelAddOperationHandler;
+import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationResult;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.RuntimeTask;
 import org.jboss.as.controller.RuntimeTaskContext;
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.server.services.net.SocketBinding;
+import org.jboss.dmr.ModelNode;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceController.Mode;
+
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.web.CommonAttributes.ENABLED;
@@ -41,18 +52,6 @@ import static org.jboss.as.web.CommonAttributes.REDIRECT_PORT;
 import static org.jboss.as.web.CommonAttributes.SCHEME;
 import static org.jboss.as.web.CommonAttributes.SECURE;
 import static org.jboss.as.web.CommonAttributes.SOCKET_BINDING;
-
-import org.jboss.as.controller.ModelAddOperationHandler;
-import org.jboss.as.controller.OperationContext;
-import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.ResultHandler;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.server.services.net.SocketBinding;
-import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController.Mode;
-
-import org.mortbay.jetty.Connector;
 
 /**
  * {@code OperationHandler} responsible for adding a web connector.
@@ -115,7 +114,7 @@ class WebConnectorAdd implements ModelAddOperationHandler {
         if (context.getRuntimeContext() != null) {
             context.getRuntimeContext().setRuntimeTask(new RuntimeTask() {
                 public void execute(RuntimeTaskContext context) throws OperationFailedException {
-                    final boolean enabled = operation.hasDefined(ENABLED) ? operation.get(ENABLED).asBoolean() : true;
+                    final boolean enabled = !operation.hasDefined(ENABLED) || operation.get(ENABLED).asBoolean();
                     final WebConnectorService service = new WebConnectorService(operation.require(PROTOCOL).asString(), operation.get(SCHEME).asString());
                     if (operation.hasDefined(SECURE)) service.setSecure(operation.get(SECURE).asBoolean());
                     if (operation.hasDefined(ENABLE_LOOKUPS))

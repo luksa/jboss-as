@@ -22,8 +22,8 @@
 
 package org.jboss.as.web.deployment;
 
+import org.eclipse.jetty.util.resource.Resource;
 import org.jboss.vfs.VirtualFile;
-import org.mortbay.resource.Resource;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -131,5 +131,14 @@ class VFSResource extends Resource {
     @Override
     public Resource addPath(String path) throws IOException {
         return new VFSResource(file.getChild(path));
+    }
+
+    @Override
+    public boolean isContainedIn(Resource resource) throws MalformedURLException {
+        if (resource instanceof VFSResource == false)
+            return false;
+
+        VFSResource vr = (VFSResource) resource;
+        return file.getParentFileList().contains(vr.file);
     }
 }

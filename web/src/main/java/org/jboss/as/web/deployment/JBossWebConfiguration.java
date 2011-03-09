@@ -22,6 +22,14 @@
 
 package org.jboss.as.web.deployment;
 
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.FilterMapping;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletMapping;
+import org.eclipse.jetty.webapp.AbstractConfiguration;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
@@ -41,14 +49,6 @@ import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WelcomeFileListMetaData;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.servlet.ErrorPageErrorHandler;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.FilterMapping;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.servlet.ServletMapping;
-import org.mortbay.jetty.webapp.WebXmlConfiguration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class JBossWebConfiguration extends WebXmlConfiguration {
+public class JBossWebConfiguration extends AbstractConfiguration {
 
     private WarMetaData warMetaData;
 
@@ -72,47 +72,42 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
     }
 
     @Override
-    public void configureClassLoader() throws Exception {
-        // do nothing, we already set this in processor
-    }
-
-    @Override
-    public void configureDefaults() throws Exception {
+    public void preConfigure(WebAppContext context) throws Exception {
         // let override it for the moment -- see SharedWebMetaDataBuilder
         // default
         JBossWebMetaData sharedWebMetaData = new JBossWebMetaData();
         JBossWebMetaDataMerger.merge(sharedWebMetaData, null, warMetaData.getSharedWebMetaData());
-        processWebMetaData(sharedWebMetaData);
+        processWebMetaData(context, sharedWebMetaData);
     }
 
     @Override
-    public void configureWebApp() throws Exception {
+    public void configure(WebAppContext context) throws Exception {
         // custom
-        processWebMetaData(warMetaData.getMergedJBossWebMetaData());
+        processWebMetaData(context, warMetaData.getMergedJBossWebMetaData());
     }
 
     @SuppressWarnings({"unchecked"})
-    protected void processWebMetaData(JBossWebMetaData metaData) throws Exception {
-        ServletHandler servletHandler = getWebAppContext().getServletHandler();
+    protected void processWebMetaData(WebAppContext context, JBossWebMetaData metaData) throws Exception {
+        ServletHandler servletHandler = context.getServletHandler();
 
         // Display name
         DescriptionGroupMetaData dg = metaData.getDescriptionGroup();
         if (dg != null) {
             String displayName = dg.getDisplayName();
             if (displayName != null) {
-                getWebAppContext().setDisplayName(displayName);
+                context.setDisplayName(displayName);
             }
         }
 
         // Distributable
         if (metaData.getDistributable() != null)
-            getWebAppContext().setDistributable(true);
+            context.setDistributable(true);
 
         // Context params
         List<ParamValueMetaData> contextParams = metaData.getContextParams();
         if (contextParams != null) {
             for (ParamValueMetaData param : contextParams) {
-                getWebAppContext().getInitParams().put(param.getParamName(), param.getParamValue());
+                context.getInitParams().put(param.getParamName(), param.getParamValue());
             }
         }
 
@@ -127,8 +122,8 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
                 String location = value.getLocation();
                 errors.put(error, location);
             }
-            if (getWebAppContext().getErrorHandler() instanceof ErrorPageErrorHandler)
-                ((ErrorPageErrorHandler) getWebAppContext().getErrorHandler()).setErrorPages(errors);
+            if (context.getErrorHandler() instanceof ErrorPageErrorHandler)
+                ((ErrorPageErrorHandler) context.getErrorHandler()).setErrorPages(errors);
         }
 
         // Filter definitions
@@ -162,7 +157,7 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
                 }
                 List<DispatcherType> dispatchers = value.getDispatchers();
                 if (dispatchers != null) {
-                    int dispatch = Handler.DEFAULT;
+                    int dispatch = FilterMapping.DEFAULT;
                     for (DispatcherType type : dispatchers)
                         dispatch |= type.ordinal();
                     filterMapping.setDispatches(dispatch);
@@ -175,14 +170,14 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
         List<ListenerMetaData> listeners = metaData.getListeners();
         if (listeners != null) {
             List<EventListener> eventListeners = new ArrayList<EventListener>();
-            EventListener[] previous = getWebAppContext().getEventListeners();
+            EventListener[] previous = context.getEventListeners();
             if (previous != null)
                 eventListeners.addAll(Arrays.asList(previous));
 
             for (ListenerMetaData value : listeners) {
-                eventListeners.add((EventListener) newInstance(value.getListenerClass()));
+                eventListeners.add((EventListener) newInstance(context, value.getListenerClass()));
             }
-            getWebAppContext().setEventListeners(eventListeners.toArray(new EventListener[eventListeners.size()]));
+            context.setEventListeners(eventListeners.toArray(new EventListener[eventListeners.size()]));
         }
 
         // Login configuration
@@ -195,7 +190,7 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
         List<MimeMappingMetaData> mimes = metaData.getMimeMappings();
         if (mimes != null) {
             for (MimeMappingMetaData value : mimes) {
-                getWebAppContext().getMimeTypes().addMimeMapping(value.getExtension(), value.getMimeType());
+                context.getMimeTypes().addMimeMapping(value.getExtension(), value.getMimeType());
             }
         }
 
@@ -247,24 +242,20 @@ public class JBossWebConfiguration extends WebXmlConfiguration {
         if (welcomeFiles != null) {
             List<String> files = welcomeFiles.getWelcomeFiles();
             if (files != null)
-                getWebAppContext().setWelcomeFiles(files.toArray(new String[files.size()]));
+                context.setWelcomeFiles(files.toArray(new String[files.size()]));
         }
 
         // Session timeout
         SessionConfigMetaData scmd = metaData.getSessionConfig();
         if (scmd != null) {
             int timeout = scmd.getSessionTimeout();
-            getWebAppContext().getSessionHandler().getSessionManager().setMaxInactiveInterval(timeout * 60);
+            context.getSessionHandler().getSessionManager().setMaxInactiveInterval(timeout * 60);
         }
     }
 
-    @Override
-    public void deconfigureWebApp() throws Exception {
-    }
-
     @SuppressWarnings({"unchecked"})
-    protected <T> T newInstance(String className) throws Exception {
-        return (T) newInstance(getWebAppContext().loadClass(className));
+    protected <T> T newInstance(WebAppContext context, String className) throws Exception {
+        return (T) newInstance(context.loadClass(className));
     }
 
     protected <T> T newInstance(Class<T> clazz) throws Exception {

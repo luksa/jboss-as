@@ -22,6 +22,9 @@
 
 package org.jboss.as.web.deployment;
 
+import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -35,9 +38,6 @@ import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.vfs.VirtualFile;
-import org.mortbay.jetty.webapp.Configuration;
-import org.mortbay.jetty.webapp.JettyWebXmlConfiguration;
-import org.mortbay.jetty.webapp.WebAppContext;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -130,9 +130,7 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
 
     protected void applyConfigurations(WarMetaData metaData, WebAppContext webContext) {
         JBossWebConfiguration jwc = new JBossWebConfiguration(metaData);
-        jwc.setWebAppContext(webContext);
         JettyWebXmlConfiguration jettyWebXmlConfiguration = new JettyWebXmlConfiguration();
-        jettyWebXmlConfiguration.setWebAppContext(webContext);
         webContext.setConfigurations(new Configuration[]{jwc, jettyWebXmlConfiguration});
     }
 }

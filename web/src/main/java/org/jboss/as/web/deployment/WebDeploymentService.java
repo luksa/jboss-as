@@ -21,6 +21,7 @@
  */
 package org.jboss.as.web.deployment;
 
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.jboss.as.web.WebServer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
@@ -28,8 +29,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.jboss.msc.value.Value;
-import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * A service starting a web deployment.
