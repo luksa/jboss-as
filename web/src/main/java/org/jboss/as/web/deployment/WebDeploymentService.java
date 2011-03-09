@@ -22,6 +22,8 @@
 package org.jboss.as.web.deployment;
 
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.jboss.as.naming.context.NamespaceContextSelector;
+import org.jboss.as.web.NamingListener;
 import org.jboss.as.web.WebServer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
@@ -40,6 +42,7 @@ class WebDeploymentService implements Service<WebAppContext> {
     private static final Logger log = Logger.getLogger("org.jboss.web");
     private final WebAppContext context;
     private final InjectedValue<WebServer> webServer = new InjectedValue<WebServer>();
+    private final InjectedValue<NamespaceContextSelector> namespaceSelector = new InjectedValue<NamespaceContextSelector>();
 
     public WebDeploymentService(final WebAppContext context) {
         this.context = context;
@@ -47,12 +50,15 @@ class WebDeploymentService implements Service<WebAppContext> {
 
     /** {@inheritDoc} */
     public synchronized void start(StartContext startContext) throws StartException {
-            try {
-                webServer.getValue().addWebAppContext(context);
-                context.start();
-            } catch (Exception e) {
-                throw new StartException("failed to start context", e);
-            }
+        NamingListener.beginComponentStart(namespaceSelector.getValue());
+        try {
+            webServer.getValue().addWebAppContext(context);
+            context.start();
+        } catch (Exception e) {
+            throw new StartException("failed to start context", e);
+        } finally {
+            NamingListener.endComponentStart();
+        }
     }
 
     /** {@inheritDoc} */
@@ -76,5 +82,9 @@ class WebDeploymentService implements Service<WebAppContext> {
 
     InjectedValue<WebServer> getWebServer() {
         return webServer;
+    }
+
+    InjectedValue<NamespaceContextSelector> getNamespaceSelector() {
+        return namespaceSelector;
     }
 }

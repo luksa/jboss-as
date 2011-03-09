@@ -25,6 +25,8 @@ package org.jboss.as.web.deployment;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.jboss.as.ee.naming.NamespaceSelectorService;
+import org.jboss.as.naming.context.NamespaceContextSelector;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -36,13 +38,10 @@ import org.jboss.as.web.WebSubsystemServices;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.service.ServiceListener;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.msc.service.StartException;
 import org.jboss.vfs.VirtualFile;
 
 import java.util.Arrays;
@@ -133,9 +132,11 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         webContext.setContextPath(pathName);
 
         try {
+            ServiceName namespaceSelectorServiceName = deploymentUnit.getServiceName().append(NamespaceSelectorService.NAME);
             WebDeploymentService webDeploymentService = new WebDeploymentService(webContext);
             ServiceBuilder<WebAppContext> serviceBuilder = serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService);
             serviceBuilder.addDependency(WebSubsystemServices.JBOSS_WEB, WebServer.class, webDeploymentService.getWebServer());
+            serviceBuilder.addDependency(namespaceSelectorServiceName, NamespaceContextSelector.class, webDeploymentService.getNamespaceSelector());
             if (enhancer != null) {
                 ServiceName enhancerName = enhancer.getServiceName();
                 if (enhancerName != null)
