@@ -130,12 +130,13 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         try {
             WebDeploymentService webDeploymentService = new WebDeploymentService(webContext);
             ServiceBuilder<WebAppContext> serviceBuilder = serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService);
-            serviceBuilder.addDependency(WebSubsystemServices.JBOSS_WEB, WebServer.class, webDeploymentService.getWebServer()).setInitialMode(Mode.ACTIVE).install();
+            serviceBuilder.addDependency(WebSubsystemServices.JBOSS_WEB, WebServer.class, webDeploymentService.getWebServer());
             if (enhancer != null) {
                 ServiceName enhancerName = enhancer.getServiceName();
                 if (enhancerName != null)
                     serviceBuilder.addDependency(enhancerName);
             }
+            serviceBuilder.setInitialMode(Mode.ACTIVE).install();
         } catch (ServiceRegistryException e) {
             throw new DeploymentUnitProcessingException("Failed to add JBoss web deployment service", e);
         }
