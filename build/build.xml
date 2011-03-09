@@ -464,6 +464,9 @@
         <module-def name="org.jboss.as.web">
             <maven-resource group="org.jboss.as" artifact="jboss-as-web"/>
             <maven-resource group="org.eclipse.jetty" artifact="jetty-server"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-io"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-continuation"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-xml"/>
             <maven-resource group="org.eclipse.jetty" artifact="jetty-http"/>
             <maven-resource group="org.eclipse.jetty" artifact="jetty-security"/>
             <maven-resource group="org.eclipse.jetty" artifact="jetty-servlet"/>
