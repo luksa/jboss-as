@@ -155,6 +155,7 @@
         <version.org.slf4j.slf4j-ext>1.5.10</version.org.slf4j.slf4j-ext>
         <version.jetty>7.3.1.v20110307</version.jetty>
         <version.jsf-el>2.2</version.jsf-el>
+        <version.jasper>glassfish_2.1.0.v201004190952</version.jasper>
         <version.osgi>4.2.0</version.osgi>
         <version.sun.jaxb>2.2</version.sun.jaxb>
         <version.sun.saaj-impl>1.3.2</version.sun.saaj-impl>
@@ -3179,6 +3180,12 @@
                 <groupId>org.glassfish.web</groupId>
                 <artifactId>el-impl</artifactId>
                 <version>${version.jsf-el}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache</groupId>
+                <artifactId>jasper</artifactId>
+                <version>${version.jasper}</version>
             </dependency>
 
             <dependency>

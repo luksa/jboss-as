@@ -167,6 +167,11 @@
     </dependency>
 
     <dependency>
+       <groupId>org.apache</groupId>
+       <artifactId>jasper</artifactId>
+    </dependency>
+
+    <dependency>
        <groupId>org.picketbox</groupId>
        <artifactId>picketbox</artifactId>
     </dependency>
