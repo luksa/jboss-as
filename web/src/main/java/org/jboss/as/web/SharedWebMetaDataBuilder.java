@@ -308,7 +308,7 @@ class SharedWebMetaDataBuilder {
           contextParams = new ArrayList<ParamValueMetaData>();
           metadata.setContextParams(contextParams);
        }
-       contextParams.add(createParameter("com.sun.faces.expressionFactory", "org.apache.el.ExpressionFactoryImpl"));
+       contextParams.add(createParameter("com.sun.faces.expressionFactory", "com.sun.el.ExpressionFactoryImpl"));
 
        ListenerMetaData jsfInitListener = new ListenerMetaData();
        jsfInitListener.setListenerClass("com.sun.faces.config.ConfigureListener");

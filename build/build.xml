@@ -473,6 +473,8 @@
             <maven-resource group="org.eclipse.jetty" artifact="jetty-servlets"/>
             <maven-resource group="org.eclipse.jetty" artifact="jetty-util"/>
             <maven-resource group="org.eclipse.jetty" artifact="jetty-webapp"/>
+            <maven-resource group="org.eclipse.jetty" artifact="jetty-jsp-2.1"/>
+            <maven-resource group="org.glassfish.web" artifact="el-impl"/>
         </module-def>
 
         <module-def name="org.jboss.as.webservices">
