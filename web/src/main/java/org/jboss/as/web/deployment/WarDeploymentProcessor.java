@@ -30,15 +30,19 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.web.Enhancer;
 import org.jboss.as.web.WebServer;
 import org.jboss.as.web.WebSubsystemServices;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.vfs.VirtualFile;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -49,6 +53,7 @@ import java.util.Collections;
 public class WarDeploymentProcessor implements DeploymentUnitProcessor {
 
     private final String defaultHost;
+    private Configuration jettyConfiguration = new JettyWebXmlConfiguration();
 
     public WarDeploymentProcessor(String defaultHost) {
         if (defaultHost == null) {
@@ -97,7 +102,11 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         webContext.setExtractWAR(false);
         webContext.setClassLoader(classLoader);
 
-        applyConfigurations(warMetaData, webContext);
+        // Apply configurations
+        JBossWebConfiguration jwc = new JBossWebConfiguration(warMetaData);
+        Enhancer enhancer = deploymentUnit.getAttachment(WebServer.ENHANCER);
+        jwc.setEnhancer(enhancer);
+        webContext.setConfigurations(Arrays.asList(jwc, jettyConfiguration).toArray(new Configuration[2]));
 
         // Set the path name
         final String deploymentName = deploymentUnit.getName();
@@ -120,17 +129,15 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
 
         try {
             WebDeploymentService webDeploymentService = new WebDeploymentService(webContext);
-            serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService)
-                    .addDependency(WebSubsystemServices.JBOSS_WEB, WebServer.class, webDeploymentService.getWebServer())
-                    .setInitialMode(Mode.ACTIVE).install();
+            ServiceBuilder<WebAppContext> serviceBuilder = serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService);
+            serviceBuilder.addDependency(WebSubsystemServices.JBOSS_WEB, WebServer.class, webDeploymentService.getWebServer()).setInitialMode(Mode.ACTIVE).install();
+            if (enhancer != null) {
+                ServiceName enhancerName = enhancer.getServiceName();
+                if (enhancerName != null)
+                    serviceBuilder.addDependency(enhancerName);
+            }
         } catch (ServiceRegistryException e) {
             throw new DeploymentUnitProcessingException("Failed to add JBoss web deployment service", e);
         }
-    }
-
-    protected void applyConfigurations(WarMetaData metaData, WebAppContext webContext) {
-        JBossWebConfiguration jwc = new JBossWebConfiguration(metaData);
-        JettyWebXmlConfiguration jettyWebXmlConfiguration = new JettyWebXmlConfiguration();
-        webContext.setConfigurations(new Configuration[]{jwc, jettyWebXmlConfiguration});
     }
 }

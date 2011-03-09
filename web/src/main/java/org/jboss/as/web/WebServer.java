@@ -23,6 +23,7 @@ package org.jboss.as.web;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.jboss.as.server.deployment.AttachmentKey;
 
 /**
  * The web server.
@@ -31,6 +32,11 @@ import org.eclipse.jetty.webapp.WebAppContext;
  * @author Ales Justin
  */
 public interface WebServer {
+
+    /**
+     * Web enhancer.
+     */
+    AttachmentKey<Enhancer> ENHANCER = AttachmentKey.create(Enhancer.class);
 
     /**
      * Add a connector.

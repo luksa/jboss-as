@@ -21,8 +21,6 @@
  */
 package org.jboss.as.weld.deployment.processors;
 
-import javax.enterprise.inject.spi.BeanManager;
-
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
 import org.jboss.as.naming.NamingStore;
 import org.jboss.as.naming.ValueJndiInjectable;
@@ -32,18 +30,22 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.web.WebServer;
 import org.jboss.as.weld.WeldContainer;
 import org.jboss.as.weld.WeldDeploymentMarker;
 import org.jboss.as.weld.arquillian.WeldContextSetup;
 import org.jboss.as.weld.deployment.BeanDeploymentArchiveImpl;
 import org.jboss.as.weld.deployment.WeldAttachments;
 import org.jboss.as.weld.services.BeanManagerService;
+import org.jboss.as.weld.services.WeldEnhancerService;
 import org.jboss.as.weld.services.WeldService;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.value.InjectedValue;
+
+import javax.enterprise.inject.spi.BeanManager;
 
 /**
  * {@link DeploymentUnitProcessor} that binds the bean manager to JNDI
@@ -92,6 +94,12 @@ public class WeldBeanManagerServiceProcessor implements DeploymentUnitProcessor 
                 .addDependency(moduleContextServiceName, NamingStore.class, beanManagerBindingService.getNamingStoreInjector())
                 .addDependency(beanManagerServiceName, BeanManager.class, injectedBeanManager)
                 .install();
+
+        WeldEnhancerService enhancerService = new WeldEnhancerService(moduleContextServiceName.append("WeldEnhancer"));
+        deploymentUnit.putAttachment(WebServer.ENHANCER, enhancerService);
+        serviceTarget.addService(enhancerService.getServiceName(), enhancerService)
+            .addDependency(beanManagerBindingServiceName, BeanManager.class, enhancerService.getBeanManager());
+
         deploymentUnit.addToAttachmentList(Attachments.SETUP_ACTIONS, new WeldContextSetup());
     }
 

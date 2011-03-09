@@ -22,14 +22,17 @@
 
 package org.jboss.as.web.deployment;
 
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.webapp.AbstractConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.jboss.as.web.Enhancer;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
@@ -49,7 +52,11 @@ import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WelcomeFileListMetaData;
+import org.jboss.msc.service.ServiceName;
 
+import javax.servlet.Filter;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
@@ -63,16 +70,26 @@ import java.util.Map;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class JBossWebConfiguration extends AbstractConfiguration {
+public class JBossWebConfiguration extends AbstractConfiguration implements Enhancer, ServletContextHandler.Decorator {
 
     private WarMetaData warMetaData;
+    private Enhancer enhancer;
 
     public JBossWebConfiguration(WarMetaData warMetaData) {
         this.warMetaData = warMetaData;
     }
 
+    public void setEnhancer(Enhancer enhancer) {
+        this.enhancer = enhancer;
+    }
+
     @Override
     public void preConfigure(WebAppContext context) throws Exception {
+        // Add decorator -- ugly impl details
+        ServletHandler handler = context.getServletHandler();
+        ContextHandler.Context servletContext = (ContextHandler.Context) handler.getServletContext();
+        ServletContextHandler contextHandler = (ServletContextHandler) servletContext.getContextHandler();
+        contextHandler.addDecorator(this);
         // let override it for the moment -- see SharedWebMetaDataBuilder
         // default
         JBossWebMetaData sharedWebMetaData = new JBossWebMetaData();
@@ -255,10 +272,65 @@ public class JBossWebConfiguration extends AbstractConfiguration {
 
     @SuppressWarnings({"unchecked"})
     protected <T> T newInstance(WebAppContext context, String className) throws Exception {
-        return (T) newInstance(context.loadClass(className));
+        return (T) create(context.loadClass(className));
     }
 
-    protected <T> T newInstance(Class<T> clazz) throws Exception {
-        return clazz.newInstance();
+    @Override
+    public <T> T create(Class<T> clazz) throws Exception {
+        return (enhancer != null) ? enhancer.create(clazz) : clazz.newInstance();
+    }
+
+    @Override
+    public <T> T enhance(T instance) {
+        return (enhancer != null) ? enhancer.enhance(instance) : instance;
+    }
+
+    @Override
+    public void destroy(Object instance) {
+        if (enhancer != null)
+            enhancer.destroy(instance);
+    }
+
+    @Override
+    public ServiceName getServiceName() {
+        return null;  // No need for the name
+    }
+
+    @Override
+    public <T extends Filter> T decorateFilterInstance(T filter) throws ServletException {
+        return enhance(filter);
+    }
+
+    @Override
+    public <T extends Servlet> T decorateServletInstance(T servlet) throws ServletException {
+        return enhance(servlet);
+    }
+
+    @Override
+    public <T extends EventListener> T decorateListenerInstance(T listener) throws ServletException {
+        return enhance(listener);
+    }
+
+    @Override
+    public void decorateFilterHolder(FilterHolder filter) throws ServletException {
+    }
+
+    @Override
+    public void decorateServletHolder(ServletHolder servlet) throws ServletException {
+    }
+
+    @Override
+    public void destroyServletInstance(Servlet s) {
+        destroy(s);
+    }
+
+    @Override
+    public void destroyFilterInstance(Filter f) {
+        destroy(f);
+    }
+
+    @Override
+    public void destroyListenerInstance(EventListener f) {
+        destroy(f);
     }
 }
