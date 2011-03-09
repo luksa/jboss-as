@@ -63,11 +63,14 @@ class WebDeploymentService implements Service<WebAppContext> {
 
     /** {@inheritDoc} */
     public synchronized void stop(StopContext stopContext) {
+        NamingListener.beginComponentStart(namespaceSelector.getValue());
         try {
             context.stop();
             webServer.getValue().removeWebAppContext(context);
         } catch (Exception e) {
             log.error("exception while stopping context", e);
+        } finally {
+            NamingListener.endComponentStart();
         }
     }
 
