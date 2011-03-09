@@ -57,8 +57,6 @@ import org.jboss.msc.service.ServiceName;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
@@ -185,15 +183,9 @@ public class JBossWebConfiguration extends AbstractConfiguration implements Enha
         // Listeners
         List<ListenerMetaData> listeners = metaData.getListeners();
         if (listeners != null) {
-            List<EventListener> eventListeners = new ArrayList<EventListener>();
-            EventListener[] previous = context.getEventListeners();
-            if (previous != null)
-                eventListeners.addAll(Arrays.asList(previous));
-
             for (ListenerMetaData value : listeners) {
-                eventListeners.add((EventListener) newInstance(context, value.getListenerClass()));
+                context.addEventListener((EventListener) newInstance(context, value.getListenerClass()));
             }
-            context.setEventListeners(eventListeners.toArray(new EventListener[eventListeners.size()]));
         }
 
         // Login configuration

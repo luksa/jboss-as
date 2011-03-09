@@ -23,13 +23,16 @@ package org.jboss.as.web;
 
 import org.jboss.as.naming.context.NamespaceContextSelector;
 
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
+
 /**
  * An InstanceListener used to push/pop the application naming context.
  *
  * @author Stuart Douglas
  * @author Ales Justin
  */
-public class NamingListener { // TODO -- add it as global event listener!
+public class NamingListener implements ServletRequestListener {
 
     private final NamespaceContextSelector selector;
 
@@ -44,23 +47,6 @@ public class NamingListener { // TODO -- add it as global event listener!
             throw new IllegalArgumentException("Null selector");
     }
 
-    /*
-    public void instanceEvent(InstanceEvent event) {
-        String type = event.getType();
-        if (type.equals(InstanceEvent.BEFORE_DISPATCH_EVENT)
-                || type.equals(InstanceEvent.BEFORE_REQUEST_EVENT)
-                || type.equals(InstanceEvent.BEFORE_DESTROY_EVENT)
-                || type.equals(InstanceEvent.BEFORE_INIT_EVENT)) {
-            NamespaceContextSelector.pushCurrentSelector(selector);
-        }
-        else if (type.equals(InstanceEvent.AFTER_DISPATCH_EVENT)
-                || type.equals(InstanceEvent.AFTER_REQUEST_EVENT)
-                || type.equals(InstanceEvent.AFTER_DESTROY_EVENT)
-                || type.equals(InstanceEvent.AFTER_INIT_EVENT)) {
-            NamespaceContextSelector.popCurrentSelector();
-        }
-    } */
-
     public static void beginComponentStart(NamespaceContextSelector selector) {
         localSelector.set(selector);
         NamespaceContextSelector.pushCurrentSelector(selector);
@@ -69,6 +55,14 @@ public class NamingListener { // TODO -- add it as global event listener!
     public static void endComponentStart() {
         NamespaceContextSelector.popCurrentSelector();
         localSelector.set(null);
+    }
+
+    public void requestInitialized(ServletRequestEvent sre) {
+        NamespaceContextSelector.pushCurrentSelector(selector);
+    }
+
+    public void requestDestroyed(ServletRequestEvent sre) {
+        NamespaceContextSelector.popCurrentSelector();
     }
 
 }
