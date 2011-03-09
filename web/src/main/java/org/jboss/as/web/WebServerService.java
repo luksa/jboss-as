@@ -21,6 +21,7 @@
  */
 package org.jboss.as.web;
 
+import org.apache.jasper.runtime.JspFactoryImpl;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -32,6 +33,8 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+
+import javax.servlet.jsp.JspFactory;
 
 /**
  * Service configuring and starting the web container.
@@ -61,6 +64,10 @@ class WebServerService implements WebServer, Service<WebServer> {
         server.setHandler(handlers);
 
         try {
+            // TODO -- add this stuff directly
+            JspFactory.setDefaultFactory(new JspFactoryImpl());
+            System.setProperty("javax.el.ExpressionFactory", "com.sun.el.ExpressionFactoryImpl");
+
             server.start();
         } catch (Exception e) {
             throw new StartException(e);
