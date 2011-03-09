@@ -36,10 +36,13 @@ import org.jboss.as.web.WebSubsystemServices;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceListener;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartException;
 import org.jboss.vfs.VirtualFile;
 
 import java.util.Arrays;
@@ -105,7 +108,9 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         // Apply configurations
         JBossWebConfiguration jwc = new JBossWebConfiguration(warMetaData);
         Enhancer enhancer = deploymentUnit.getAttachment(WebServer.ENHANCER);
-        jwc.setEnhancer(enhancer);
+        if (enhancer != null) {
+            jwc.setEnhancer(new TCCLEnhancer(classLoader, enhancer));
+        }
         webContext.setConfigurations(Arrays.asList(jwc, jettyConfiguration).toArray(new Configuration[2]));
 
         // Set the path name

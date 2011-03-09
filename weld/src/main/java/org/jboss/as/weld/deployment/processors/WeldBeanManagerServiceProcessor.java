@@ -98,7 +98,8 @@ public class WeldBeanManagerServiceProcessor implements DeploymentUnitProcessor 
         WeldEnhancerService enhancerService = new WeldEnhancerService(moduleContextServiceName.append("WeldEnhancer"));
         deploymentUnit.putAttachment(WebServer.ENHANCER, enhancerService);
         serviceTarget.addService(enhancerService.getServiceName(), enhancerService)
-            .addDependency(beanManagerBindingServiceName, BeanManager.class, enhancerService.getBeanManager());
+            .addDependency(beanManagerServiceName, BeanManager.class, enhancerService.getBeanManager())
+            .install();
 
         deploymentUnit.addToAttachmentList(Attachments.SETUP_ACTIONS, new WeldContextSetup());
     }

@@ -85,11 +85,6 @@ public class JBossWebConfiguration extends AbstractConfiguration implements Enha
 
     @Override
     public void preConfigure(WebAppContext context) throws Exception {
-        // Add decorator -- ugly impl details
-        ServletHandler handler = context.getServletHandler();
-        ContextHandler.Context servletContext = (ContextHandler.Context) handler.getServletContext();
-        ServletContextHandler contextHandler = (ServletContextHandler) servletContext.getContextHandler();
-        contextHandler.addDecorator(this);
         // let override it for the moment -- see SharedWebMetaDataBuilder
         // default
         JBossWebMetaData sharedWebMetaData = new JBossWebMetaData();
@@ -99,6 +94,10 @@ public class JBossWebConfiguration extends AbstractConfiguration implements Enha
 
     @Override
     public void configure(WebAppContext context) throws Exception {
+        // Add decorator -- ugly impl details
+        ContextHandler.Context servletContext = ContextHandler.getCurrentContext();
+        ServletContextHandler contextHandler = (ServletContextHandler) servletContext.getContextHandler();
+        contextHandler.addDecorator(this);
         // custom
         processWebMetaData(context, warMetaData.getMergedJBossWebMetaData());
     }
