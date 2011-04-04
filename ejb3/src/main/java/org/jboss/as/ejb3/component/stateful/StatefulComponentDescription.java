@@ -22,7 +22,7 @@
 
 package org.jboss.as.ejb3.component.stateful;
 
-import org.jboss.as.ee.component.AbstractComponentConfiguration;
+import org.jboss.as.ee.component.ComponentConfiguration;
 
 import org.jboss.as.ee.component.EEModuleDescription;
 
@@ -45,7 +45,7 @@ public class StatefulComponentDescription extends SessionBeanComponentDescriptio
     }
 
     @Override
-    protected AbstractComponentConfiguration constructComponentConfiguration() {
+    protected ComponentConfiguration constructComponentConfiguration() {
         return new StatefulSessionComponentConfiguration(this);
     }
 

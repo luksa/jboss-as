@@ -25,12 +25,10 @@ package org.jboss.as.ejb3.deployment.processors;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
-import org.jboss.as.ejb3.EjbJarDescription;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentDescription;
 import org.jboss.as.ejb3.component.singleton.SingletonComponentDescription;
 import org.jboss.as.ejb3.component.stateful.StatefulComponentDescription;
 import org.jboss.as.ejb3.component.stateless.StatelessComponentDescription;
-import org.jboss.as.ejb3.deployment.EjbDeploymentAttachmentKeys;
 import org.jboss.as.ejb3.deployment.EjbDeploymentMarker;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -75,7 +73,7 @@ public class EjbAnnotationProcessor implements DeploymentUnitProcessor {
         }
         // get the module description
         final EEModuleDescription moduleDescription = deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
-        final String applicationName = moduleDescription.getAppName();
+        final String applicationName = moduleDescription.getApplicationName();
         final CompositeIndex compositeIndex = deploymentUnit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
         if (compositeIndex == null) {
             if (logger.isTraceEnabled()) {
@@ -113,7 +111,7 @@ public class EjbAnnotationProcessor implements DeploymentUnitProcessor {
     private void processSessionBeans(DeploymentUnit deploymentUnit, CompositeIndex compositeIndex, List<AnnotationInstance> sessionBeanAnnotations, SessionBeanType sessionBeanType) {
         // get the module description
         final EEModuleDescription moduleDescription = deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
-        final String applicationName = moduleDescription.getAppName();
+        final String applicationName = moduleDescription.getApplicationName();
 
         // process these session bean annotations and create component descriptions out of it
         for (AnnotationInstance sessionBeanAnnotation : sessionBeanAnnotations) {

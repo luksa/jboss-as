@@ -27,8 +27,6 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.ContextConfig;
-import org.jboss.as.ee.naming.NamespaceSelectorService;
-import org.jboss.as.naming.context.NamespaceContextSelector;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -42,7 +40,6 @@ import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.security.AuthenticationManager;
@@ -205,13 +202,11 @@ public class WarDeploymentProcessor implements DeploymentUnitProcessor {
         }
 
         try {
-            ServiceName namespaceSelectorServiceName = deploymentUnit.getServiceName().append(NamespaceSelectorService.NAME);
             WebDeploymentService webDeploymentService = new WebDeploymentService(webContext);
             ServiceBuilder<Context> builder = serviceTarget.addService(WebSubsystemServices.JBOSS_WEB.append(deploymentName), webDeploymentService);
             builder.addDependency(WebSubsystemServices.JBOSS_WEB_HOST.append(hostName), Host.class,
                             new WebContextInjector(webContext)).addDependencies(injectionContainer.getServiceNames());
-            builder.addDependency(namespaceSelectorServiceName, NamespaceContextSelector.class,
-                            webDeploymentService.getNamespaceSelector()).setInitialMode(Mode.ACTIVE);
+            builder.setInitialMode(Mode.ACTIVE);
 
             builder.addDependencies(deploymentUnit.getAttachmentList(Attachments.WEB_DEPENDENCIES));
 

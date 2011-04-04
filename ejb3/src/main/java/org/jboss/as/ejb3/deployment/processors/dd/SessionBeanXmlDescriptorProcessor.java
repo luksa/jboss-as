@@ -86,7 +86,7 @@ public class SessionBeanXmlDescriptorProcessor extends AbstractEjbXmlDescriptorP
         DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         // get the module description
         final EEModuleDescription moduleDescription = deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
-        final String applicationName = moduleDescription.getAppName();
+        final String applicationName = moduleDescription.getApplicationName();
 
         SessionType sessionType = sessionBean.getSessionType();
         if (sessionType == null) {

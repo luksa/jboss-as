@@ -31,12 +31,11 @@ import java.util.List;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceProvider;
 
-import org.jboss.as.ee.component.AbstractComponentDescription;
+import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentDescription;
 import org.jboss.as.ejb3.component.singleton.SingletonComponentDescription;
 import org.jboss.as.ejb3.component.stateless.StatelessComponentDescription;
-import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentException;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.webservices.util.ASHelper;
@@ -81,7 +80,7 @@ public final class WSEJBAdapterDeployer {
                final AnnotationTarget target = webServiceAnnotation.target();
                final ClassInfo webServiceClassInfo = (ClassInfo) target;
                final String beanClassName = webServiceClassInfo.name().toString();
-               AbstractComponentDescription absCD = moduleDescription.getComponentByClassName(beanClassName);
+               ComponentDescription absCD = moduleDescription.getComponentByClassName(beanClassName);
 
                final String componentName = beanClassName.substring(beanClassName.lastIndexOf(".") + 1);
                final ServiceName baseName = unit.getServiceName().append("component").append(componentName).append("START"); // TODO: hacky, hacky, hacky :(

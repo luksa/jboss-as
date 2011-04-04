@@ -21,8 +21,8 @@
  */
 package org.jboss.as.ejb3.component;
 
-import org.jboss.as.ee.component.AbstractComponentConfiguration;
-import org.jboss.as.ee.component.AbstractComponentDescription;
+import org.jboss.as.ee.component.ComponentConfiguration;
+import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentNamingMode;
 import org.jboss.as.ee.component.EEModuleDescription;
 
@@ -38,7 +38,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
-public abstract class EJBComponentDescription extends AbstractComponentDescription {
+public abstract class EJBComponentDescription extends ComponentDescription {
     /**
      * EJB 3.1 FR 13.3.7, the default transaction attribute is <i>REQUIRED</i>.
      */
@@ -84,7 +84,7 @@ public abstract class EJBComponentDescription extends AbstractComponentDescripti
      * @param moduleDescription the module
      */
     public EJBComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription) {
-        super(componentName, componentClassName, moduleDescription);
+        super(componentName, componentClassName, moduleDescription, classDescription, deploymentUnitServiceName);
         //TODO: This should not be create for EJB's in a war
         setNamingMode(ComponentNamingMode.CREATE);
     }
@@ -181,7 +181,7 @@ public abstract class EJBComponentDescription extends AbstractComponentDescripti
     }
 
     @Override
-    protected void processComponentMethod(AbstractComponentConfiguration configuration, Method componentMethod) throws DeploymentUnitProcessingException {
+    protected void processComponentMethod(ComponentConfiguration configuration, Method componentMethod) throws DeploymentUnitProcessingException {
         super.processComponentMethod(configuration, componentMethod);
 
         // TODO: a temporary measure until EJBTHREE-2120 is fully resolved
@@ -190,7 +190,7 @@ public abstract class EJBComponentDescription extends AbstractComponentDescripti
     }
 
     @Override
-    protected void processViewMethod(AbstractComponentConfiguration configuration, Class<?> viewClass, Method viewMethod, Method componentMethod) {
+    protected void processViewMethod(ComponentConfiguration configuration, Class<?> viewClass, Method viewMethod, Method componentMethod) {
         super.processViewMethod(configuration, viewClass, viewMethod, componentMethod);
 
         MethodIntf methodIntf = getMethodIntf(viewClass.getName());

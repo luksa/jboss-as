@@ -22,20 +22,8 @@
 
 package org.jboss.as.ejb3.component.singleton;
 
-import org.jboss.as.ee.component.AbstractComponent;
-import org.jboss.as.ee.component.Component;
-import org.jboss.as.ee.component.ComponentInterceptorFactory;
-import org.jboss.as.ejb3.component.EJBBusinessMethod;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentConfiguration;
-import org.jboss.as.ejb3.concurrency.ContainerManagedConcurrencyInterceptor;
-import org.jboss.ejb3.concurrency.spi.LockableComponent;
 import org.jboss.invocation.ImmediateInterceptorFactory;
-import org.jboss.invocation.Interceptor;
-import org.jboss.invocation.InterceptorFactoryContext;
-
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.LockType;
-import java.util.Map;
 
 /**
  * @author Jaikiran Pai
@@ -57,11 +45,6 @@ public class SingletonComponentConfiguration extends SessionBeanComponentConfigu
         // instance associating interceptor
         this.addComponentSystemInterceptorFactory(new ImmediateInterceptorFactory(new SingletonComponentInstanceAssociationInterceptor()));
 
-    }
-
-    @Override
-    public AbstractComponent constructComponent() {
-        return new SingletonComponent(this);
     }
 
     public boolean isInitOnStartup() {

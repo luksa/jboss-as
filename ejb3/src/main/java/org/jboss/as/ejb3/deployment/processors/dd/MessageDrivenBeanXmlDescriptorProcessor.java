@@ -43,7 +43,7 @@ public class MessageDrivenBeanXmlDescriptorProcessor extends AbstractEjbXmlDescr
         DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         // get the module description
         final EEModuleDescription moduleDescription = deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
-        final String applicationName = moduleDescription.getAppName();
+        final String applicationName = moduleDescription.getApplicationName();
 
         String ejbName = mdb.getEjbName();
         String ejbClassName = mdb.getEjbClass();

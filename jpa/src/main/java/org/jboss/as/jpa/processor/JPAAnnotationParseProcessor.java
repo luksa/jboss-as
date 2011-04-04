@@ -23,18 +23,18 @@
 package org.jboss.as.jpa.processor;
 
 import org.jboss.as.ee.component.AbstractComponentConfigProcessor;
-import org.jboss.as.ee.component.AbstractComponentDescription;
-import org.jboss.as.ee.component.BindingDescription;
-import org.jboss.as.ee.component.BindingSourceDescription;
-import org.jboss.as.ee.component.InjectionTargetDescription;
-import org.jboss.as.ee.component.InterceptorDescription;
+import org.jboss.as.ee.component.ComponentDescription;
+import org.jboss.as.ee.component.FieldInjectionTarget;
+import org.jboss.as.ee.component.InjectionSource;
+import org.jboss.as.ee.component.InjectionTarget;
+import org.jboss.as.ee.component.MethodInjectionTarget;
 import org.jboss.as.ejb3.component.stateful.StatefulComponentDescription;
 import org.jboss.as.jpa.container.PersistenceUnitSearch;
-import org.jboss.as.jpa.injectors.PersistenceUnitBindingSourceDescription;
+import org.jboss.as.jpa.injectors.PersistenceContextInjectionSource;
+import org.jboss.as.jpa.injectors.PersistenceUnitInjectionSource;
 import org.jboss.as.jpa.interceptor.SFSBCreateInterceptorFactory;
 import org.jboss.as.jpa.interceptor.SFSBDestroyInterceptorFactory;
 import org.jboss.as.jpa.interceptor.SFSBInvocationInterceptorFactory;
-import org.jboss.as.jpa.injectors.PersistenceContextBindingSourceDescription;
 import org.jboss.as.jpa.service.PersistenceUnitService;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -83,7 +83,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
     protected void processComponentConfig(final DeploymentUnit deploymentUnit,
                                           final DeploymentPhaseContext phaseContext,
                                           final CompositeIndex compositeIndex,
-                                          final AbstractComponentDescription componentDescription)
+                                          final ComponentDescription componentDescription)
         throws DeploymentUnitProcessingException {
 
         final ClassInfo classInfo = compositeIndex.getClassByName(DotName.createSimple(componentDescription.getComponentClassName()));
@@ -103,7 +103,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
 
     private List<BindingDescription> getConfigurations(final DeploymentUnit deploymentUnit,
                                                        final ClassInfo classInfo,
-                                                       final AbstractComponentDescription componentDescription,
+                                                       final ComponentDescription componentDescription,
                                                        final DeploymentPhaseContext phaseContext)
         throws DeploymentUnitProcessingException {
 
@@ -136,7 +136,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
 
     private BindingDescription getConfiguration(final DeploymentUnit deploymentUnit,
                                                 final AnnotationInstance annotation,
-                                                final AbstractComponentDescription componentDescription,
+                                                final ComponentDescription componentDescription,
                                                 final DeploymentPhaseContext phaseContext)
         throws DeploymentUnitProcessingException {
 
@@ -158,7 +158,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
     private BindingDescription processField(final DeploymentUnit deploymentUnit,
                                             final AnnotationInstance annotation,
                                             final FieldInfo fieldInfo,
-                                            final AbstractComponentDescription componentDescription,
+                                            final ComponentDescription componentDescription,
                                             final DeploymentPhaseContext phaseContext)
         throws DeploymentUnitProcessingException {
 
@@ -184,11 +184,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
         bindingDescription.setReferenceSourceDescription(getBindingSource(deploymentUnit,annotation,injectionTypeName));
 
         // setup the injection target
-        final InjectionTargetDescription targetDescription = new InjectionTargetDescription();
-        targetDescription.setName(fieldName);
-        targetDescription.setClassName(fieldInfo.declaringClass().name().toString());
-        targetDescription.setType(InjectionTargetDescription.Type.FIELD);
-        targetDescription.setDeclaredValueClassName(fieldInfo.type().name().toString());
+        final InjectionTarget targetDescription = new FieldInjectionTarget(fieldName, fieldInfo.declaringClass().name().toString(), fieldInfo.type().name().toString());
         bindingDescription.getInjectionTargetDescriptions().add(targetDescription);
 
         return bindingDescription;
@@ -197,7 +193,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
     private BindingDescription processMethod(final DeploymentUnit deploymentUnit,
                                              final AnnotationInstance annotation,
                                              final MethodInfo methodInfo,
-                                             final AbstractComponentDescription componentDescription,
+                                             final ComponentDescription componentDescription,
                                              final DeploymentPhaseContext phaseContext)
         throws DeploymentUnitProcessingException {
 
@@ -226,11 +222,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
         bindingDescription.setReferenceSourceDescription(getBindingSource(deploymentUnit,annotation,injectionTypeName));
 
         // setup the injection target
-        final InjectionTargetDescription targetDescription = new InjectionTargetDescription();
-        targetDescription.setName(methodName);
-        targetDescription.setClassName(methodInfo.declaringClass().name().toString());
-        targetDescription.setType(InjectionTargetDescription.Type.METHOD);
-        targetDescription.setDeclaredValueClassName(methodInfo.returnType().name().toString());
+        final InjectionTarget targetDescription = new MethodInjectionTarget(methodName, methodInfo.declaringClass().name().toString(), methodInfo.returnType().name().toString());
         bindingDescription.getInjectionTargetDescriptions().add(targetDescription);
         return bindingDescription;
     }
@@ -239,7 +231,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
         final DeploymentUnit deploymentUnit,
         final AnnotationInstance annotation,
         final ClassInfo classInfo,
-        final AbstractComponentDescription componentDescription,
+        final ComponentDescription componentDescription,
         final DeploymentPhaseContext phaseContext)
         throws DeploymentUnitProcessingException {
 
@@ -257,7 +249,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
         return bindingDescription;
     }
 
-    private BindingSourceDescription getBindingSource(
+    private InjectionSource getBindingSource(
         final DeploymentUnit deploymentUnit,
         final AnnotationInstance annotation,
         String injectionTypeName)
@@ -283,9 +275,9 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
                 properties = null;
             }
 
-            return new PersistenceContextBindingSourceDescription(type,properties, puServiceName, deploymentUnit, scopedPuName, injectionTypeName);
+            return new PersistenceContextInjectionSource(type,properties, puServiceName, deploymentUnit, scopedPuName, injectionTypeName);
         } else {
-            return new PersistenceUnitBindingSourceDescription(puServiceName, deploymentUnit, scopedPuName, injectionTypeName);
+            return new PersistenceUnitInjectionSource(puServiceName, deploymentUnit, scopedPuName, injectionTypeName);
         }
     }
 
@@ -334,7 +326,7 @@ public class JPAAnnotationParseProcessor extends AbstractComponentConfigProcesso
     }
 
     // Register our listeners on SFSB that will be created
-    private void registerInterceptors(AbstractComponentDescription componentDescription, AnnotationInstance annotation) {
+    private void registerInterceptors(ComponentDescription componentDescription, AnnotationInstance annotation) {
         if (componentDescription instanceof StatefulComponentDescription && isExtendedPersistenceContext(annotation)) {
             componentDescription.addPostConstructInterceptorFactory(new SFSBCreateInterceptorFactory());
             componentDescription.addPreDestroyInterceptorFactory(new SFSBDestroyInterceptorFactory());

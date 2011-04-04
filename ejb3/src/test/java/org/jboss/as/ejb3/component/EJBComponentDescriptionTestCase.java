@@ -21,7 +21,7 @@
  */
 package org.jboss.as.ejb3.component;
 
-import org.jboss.as.ee.component.AbstractComponentConfiguration;
+import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.junit.Test;
 
@@ -57,7 +57,7 @@ public class EJBComponentDescriptionTestCase {
             }
 
             @Override
-            protected AbstractComponentConfiguration constructComponentConfiguration() {
+            protected ComponentConfiguration constructComponentConfiguration() {
                 return configuration;
             }
         };
