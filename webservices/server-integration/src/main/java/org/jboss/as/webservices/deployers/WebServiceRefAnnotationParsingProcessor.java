@@ -26,7 +26,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import org.jboss.as.ee.component.BindingConfiguration;
 import org.jboss.as.ee.component.ClassConfigurator;
-import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.Attachments;
 import org.jboss.as.ee.component.EEApplicationDescription;
 import org.jboss.as.ee.component.EEModuleClassConfiguration;
@@ -202,7 +201,7 @@ public class WebServiceRefAnnotationParsingProcessor implements DeploymentUnitPr
             this.serviceRef = serviceRef;
         }
 
-        public void getResourceValue(ComponentConfiguration componentConfiguration, ServiceBuilder<?> serviceBuilder, DeploymentPhaseContext phaseContext, Injector<ManagedReferenceFactory> injector) throws DeploymentUnitProcessingException {
+        public void getResourceValue(final ResolutionContext resolutionContext, ServiceBuilder<?> serviceBuilder, DeploymentPhaseContext phaseContext, Injector<ManagedReferenceFactory> injector) throws DeploymentUnitProcessingException {
             final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
             final EEApplicationDescription applicationComponentDescription = deploymentUnit.getAttachment(Attachments.EE_APPLICATION_DESCRIPTION);
             if (applicationComponentDescription == null) {
