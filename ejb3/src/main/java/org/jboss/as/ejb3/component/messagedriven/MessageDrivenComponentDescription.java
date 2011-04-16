@@ -21,14 +21,11 @@
  */
 package org.jboss.as.ejb3.component.messagedriven;
 
-import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.ee.component.ViewDescription;
 import org.jboss.as.ejb3.component.EJBComponentDescription;
 import org.jboss.as.ejb3.component.MethodIntf;
-import org.jboss.as.server.deployment.DeploymentPhaseContext;
-import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceName;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -42,10 +39,11 @@ public class MessageDrivenComponentDescription extends EJBComponentDescription {
      *
      * @param componentName      the component name
      * @param componentClassName the component instance class name
-     * @param moduleDescription the module description
+     * @param moduleDescription  the module description
      */
-    public MessageDrivenComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription) {
-        super(componentName, componentClassName, moduleDescription);
+    public MessageDrivenComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription,
+                                             final ServiceName deploymentUnitServiceName) {
+        super(componentName, componentClassName, moduleDescription, deploymentUnitServiceName);
     }
 
     @Override
@@ -78,10 +76,15 @@ public class MessageDrivenComponentDescription extends EJBComponentDescription {
 //        }
 //    }
 
-//    public void setMessageListenerInterfaceName(String messageListenerInterfaceName) {
-//        getViewClassNames().add(messageListenerInterfaceName);
-//        this.messageListenerInterfaceName = messageListenerInterfaceName;
-//    }
+    public void setMessageListenerInterfaceName(String messageListenerInterfaceName) {
+        if (messageListenerInterfaceName == null || messageListenerInterfaceName.isEmpty()) {
+            throw new IllegalArgumentException("Cannot set null or empty string as message listener interface");
+        }
+        this.messageListenerInterfaceName = messageListenerInterfaceName;
+        // add it to the view description
+        ViewDescription viewDescription = new ViewDescription(this, messageListenerInterfaceName);
+        this.getViews().add(viewDescription);
+    }
 
     public void setResourceAdapterName(String resourceAdapterName) {
         this.resourceAdapterName = resourceAdapterName;

@@ -21,10 +21,10 @@
  */
 package org.jboss.as.ejb3.component;
 
-import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentNamingMode;
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.msc.service.ServiceName;
 
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagementType;
@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -81,10 +80,10 @@ public abstract class EJBComponentDescription extends ComponentDescription {
      *
      * @param componentName      the component name
      * @param componentClassName the component instance class name
-     * @param moduleDescription the module
+     * @param moduleDescription  the module
      */
-    public EJBComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription) {
-        super(componentName, componentClassName, moduleDescription, classDescription, deploymentUnitServiceName);
+    public EJBComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription, final ServiceName deploymentUnitServiceName) {
+        super(componentName, componentClassName, moduleDescription, moduleDescription.getOrAddClassByName(componentClassName), deploymentUnitServiceName);
         //TODO: This should not be create for EJB's in a war
         setNamingMode(ComponentNamingMode.CREATE);
     }
@@ -180,25 +179,25 @@ public abstract class EJBComponentDescription extends ComponentDescription {
         return this.getComponentClassName();
     }
 
-    @Override
-    protected void processComponentMethod(ComponentConfiguration configuration, Method componentMethod) throws DeploymentUnitProcessingException {
-        super.processComponentMethod(configuration, componentMethod);
-
-        // TODO: a temporary measure until EJBTHREE-2120 is fully resolved
-        MethodIntf methodIntf = MethodIntf.BEAN;
-        processTxAttr((EJBComponentConfiguration) configuration, methodIntf, componentMethod);
-    }
-
-    @Override
-    protected void processViewMethod(ComponentConfiguration configuration, Class<?> viewClass, Method viewMethod, Method componentMethod) {
-        super.processViewMethod(configuration, viewClass, viewMethod, componentMethod);
-
-        MethodIntf methodIntf = getMethodIntf(viewClass.getName());
-        processTxAttr((EJBComponentConfiguration) configuration, methodIntf, viewMethod);
-    }
+//    @Override
+//    protected void processComponentMethod(ComponentConfiguration configuration, Method componentMethod) throws DeploymentUnitProcessingException {
+//        super.processComponentMethod(configuration, componentMethod);
+//
+//        // TODO: a temporary measure until EJBTHREE-2120 is fully resolved
+//        MethodIntf methodIntf = MethodIntf.BEAN;
+//        processTxAttr((EJBComponentConfiguration) configuration, methodIntf, componentMethod);
+//    }
+//
+//    @Override
+//    protected void processViewMethod(ComponentConfiguration configuration, Class<?> viewClass, Method viewMethod, Method componentMethod) {
+//        super.processViewMethod(configuration, viewClass, viewMethod, componentMethod);
+//
+//        MethodIntf methodIntf = getMethodIntf(viewClass.getName());
+//        processTxAttr((EJBComponentConfiguration) configuration, methodIntf, viewMethod);
+//    }
 
     private void processTxAttr(EJBComponentConfiguration configuration, MethodIntf methodIntf, Method method) {
-        if(configuration.getTransactionManagementType().equals(TransactionManagementType.BEAN)) {
+        if (configuration.getTransactionManagementType().equals(TransactionManagementType.BEAN)) {
             // it's a BMT bean
             return;
         }
