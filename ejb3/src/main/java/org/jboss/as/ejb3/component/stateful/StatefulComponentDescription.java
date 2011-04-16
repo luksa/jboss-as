@@ -45,11 +45,6 @@ public class StatefulComponentDescription extends SessionBeanComponentDescriptio
     }
 
     @Override
-    protected ComponentConfiguration constructComponentConfiguration() {
-        return new StatefulSessionComponentConfiguration(this);
-    }
-
-    @Override
     public boolean allowsConcurrentAccess() {
         return true;
     }
