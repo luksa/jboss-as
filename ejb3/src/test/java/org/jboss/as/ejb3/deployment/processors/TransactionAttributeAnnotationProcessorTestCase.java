@@ -31,6 +31,7 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.jandex.Indexer;
+import org.jboss.msc.service.ServiceName;
 import org.junit.Test;
 
 import javax.ejb.TransactionAttribute;
@@ -49,7 +50,8 @@ import static org.junit.Assert.assertEquals;
 public class TransactionAttributeAnnotationProcessorTestCase {
     @TransactionAttribute(TransactionAttributeType.MANDATORY)
     private static class MyBean implements ViewA, ViewB {
-        public void doSomething() { }
+        public void doSomething() {
+        }
     }
 
     private static interface ViewA {
@@ -73,7 +75,8 @@ public class TransactionAttributeAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp", "TestModule");
-        EJBComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        EJBComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription, duServiceName);
         TransactionAttributeAnnotationProcessor processor = new TransactionAttributeAnnotationProcessor();
         processor.processComponentConfig(deploymentUnit, phaseContext, index, componentDescription);
 
@@ -93,7 +96,8 @@ public class TransactionAttributeAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp", "TestModule");
-        SessionBeanComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        SessionBeanComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription, duServiceName);
         Collection<String> views = new HashSet<String>();
         views.add(ViewA.class.getName());
         views.add(ViewB.class.getName());

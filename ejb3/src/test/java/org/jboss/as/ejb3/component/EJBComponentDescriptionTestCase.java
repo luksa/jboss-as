@@ -23,6 +23,8 @@ package org.jboss.as.ejb3.component;
 
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.server.deployment.Services;
+import org.jboss.msc.service.ServiceName;
 import org.junit.Test;
 
 import javax.ejb.TransactionManagementType;
@@ -49,22 +51,18 @@ public class EJBComponentDescriptionTestCase {
         when(configuration.getTransactionManagementType()).thenReturn(TransactionManagementType.BEAN);
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp","TestModule");
-
-        final EJBComponentDescription description = new EJBComponentDescription("Test", "TestBean", moduleDescription) {
+        final ServiceName duServiceName = Services.deploymentUnitName("Dummy Deployment Unit");
+        final EJBComponentDescription description = new EJBComponentDescription("Test", "TestBean", moduleDescription, duServiceName) {
             @Override
             public MethodIntf getMethodIntf(String viewClassName) {
                 return MethodIntf.LOCAL;
-            }
-
-            @Override
-            protected ComponentConfiguration constructComponentConfiguration() {
-                return configuration;
             }
         };
         Class<?> viewClass = TestBean.class;
         Method viewMethod = TestBean.class.getMethod("someMethod");
         Method componentMethod = null;
-        description.processViewMethod(configuration, viewClass, viewMethod, componentMethod);
+        // TODO: Review this testcase
+        // description.processViewMethod(configuration, viewClass, viewMethod, componentMethod);
         // no NPE means pass
     }
 }

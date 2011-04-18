@@ -23,12 +23,14 @@
 package org.jboss.as.ejb3.component.description;
 
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.ee.component.ViewDescription;
 import org.jboss.as.ejb3.EjbJarDescription;
 import org.jboss.as.ejb3.component.MethodIntf;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentDescription;
 import org.jboss.as.ejb3.component.singleton.SingletonComponentDescription;
 import org.jboss.as.ejb3.component.stateful.StatefulComponentDescription;
 import org.jboss.as.ejb3.component.stateless.StatelessComponentDescription;
+import org.jboss.msc.service.ServiceName;
 
 import javax.ejb.AccessTimeout;
 import javax.ejb.ConcurrencyManagementType;
@@ -211,18 +213,20 @@ public class EjbJarDescriptionMergingUtil {
         }
 
         // views
-        Collection<String> overrideViews = override.getViewClassNames();
+        Collection<ViewDescription> overrideViews = override.getViews();
         if (overrideViews != null && !overrideViews.isEmpty()) {
-            for (String view : overrideViews) {
-                MethodIntf viewType = override.getMethodIntf(view);
-                addView(mergedBean, view, viewType);
+            for (ViewDescription view : overrideViews) {
+                String viewClassName = view.getViewClassName();
+                MethodIntf viewType = override.getMethodIntf(viewClassName);
+                addView(mergedBean, viewClassName, viewType);
             }
         } else {
-            Collection<String> originalViews = original.getViewClassNames();
+            Collection<ViewDescription> originalViews = original.getViews();
             if (originalViews != null) {
-                for (String view : originalViews) {
-                    MethodIntf viewType = original.getMethodIntf(view);
-                    addView(mergedBean, view, viewType);
+                for (ViewDescription view : originalViews) {
+                    String viewClassName = view.getViewClassName();
+                    MethodIntf viewType = original.getMethodIntf(viewClassName);
+                    addView(mergedBean, viewClassName, viewType);
                 }
 
             }
@@ -245,13 +249,14 @@ public class EjbJarDescriptionMergingUtil {
 
     private static SessionBeanComponentDescription createNewSessionBean(SessionBeanComponentDescription source, EEModuleDescription moduleDescription) {
         SessionBeanComponentDescription.SessionBeanType sessionBeanType = source.getSessionBeanType();
+        ServiceName deploymentUnitServiceName = source.getServiceName().getParent();
         switch (sessionBeanType) {
             case STATELESS:
-                return new StatelessComponentDescription(source.getComponentName(), source.getComponentClassName(), moduleDescription);
+                return new StatelessComponentDescription(source.getComponentName(), source.getComponentClassName(), moduleDescription, deploymentUnitServiceName);
             case STATEFUL:
-                return new StatefulComponentDescription(source.getComponentName(), source.getComponentClassName(), moduleDescription);
+                return new StatefulComponentDescription(source.getComponentName(), source.getComponentClassName(), moduleDescription, deploymentUnitServiceName);
             case SINGLETON:
-                return new SingletonComponentDescription(source.getComponentName(), source.getComponentClassName(), moduleDescription);
+                return new SingletonComponentDescription(source.getComponentName(), source.getComponentClassName(), moduleDescription, deploymentUnitServiceName);
             default:
                 throw new IllegalArgumentException("Unknown session bean type: " + sessionBeanType + " for bean " + source.getEJBName());
         }

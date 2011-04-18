@@ -29,6 +29,7 @@ import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.Services;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.jandex.Indexer;
 import org.jboss.msc.service.ServiceName;
@@ -60,7 +61,7 @@ public class TransactionManagementAnnotationProcessorTestCase {
 
     @Test
     public void test1() throws Exception {
-        DeploymentUnit deploymentUnit = this.getDeploymentUnit();
+        DeploymentUnit deploymentUnit = this.getDeploymentUnit("test1 Dummy DU");
         // Mark the deployment unit as a EJB deployment
         EjbDeploymentMarker.mark(deploymentUnit);
         DeploymentPhaseContext phaseContext = null;
@@ -70,7 +71,8 @@ public class TransactionManagementAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp", "TestModule");
-        EJBComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        EJBComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription, duServiceName);
         TransactionManagementAnnotationProcessor processor = new TransactionManagementAnnotationProcessor();
         processor.processComponentConfig(deploymentUnit, phaseContext, index, componentDescription);
 
@@ -83,7 +85,8 @@ public class TransactionManagementAnnotationProcessorTestCase {
     @Test
     public void testDefault() {
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp", "TestModule");
-        EJBComponentDescription componentDescription = new StatelessComponentDescription("TestBean", "TestClass", moduleDescription);
+        final ServiceName duServiceName = Services.deploymentUnitName("Dummy deployment unit");
+        EJBComponentDescription componentDescription = new StatelessComponentDescription("TestBean", "TestClass", moduleDescription, duServiceName);
         assertEquals(TransactionManagementType.CONTAINER, componentDescription.getTransactionManagementType());
     }
 
@@ -92,7 +95,7 @@ public class TransactionManagementAnnotationProcessorTestCase {
      */
     @Test
     public void testSubClass() throws Exception {
-        DeploymentUnit deploymentUnit = this.getDeploymentUnit();
+        DeploymentUnit deploymentUnit = this.getDeploymentUnit("testSubClass dummy DU");
         // Mark the deployment unit as a EJB deployment
         EjbDeploymentMarker.mark(deploymentUnit);
         DeploymentPhaseContext phaseContext = null;
@@ -102,30 +105,31 @@ public class TransactionManagementAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp", "TestModule");
-        EJBComponentDescription componentDescription = new StatelessComponentDescription(SubBean.class.getSimpleName(), SubBean.class.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        EJBComponentDescription componentDescription = new StatelessComponentDescription(SubBean.class.getSimpleName(), SubBean.class.getName(), moduleDescription, duServiceName);
         TransactionManagementAnnotationProcessor processor = new TransactionManagementAnnotationProcessor();
         processor.processComponentConfig(deploymentUnit, phaseContext, index, componentDescription);
 
         assertEquals(TransactionManagementType.CONTAINER, componentDescription.getTransactionManagementType());
     }
 
-    private DeploymentUnit getDeploymentUnit() {
+    private DeploymentUnit getDeploymentUnit(final String duName) {
         return new DeploymentUnit() {
             private Map<AttachmentKey<?>, Object> attachments = new HashMap();
 
             @Override
             public ServiceName getServiceName() {
-                throw new RuntimeException("NYI");
+                return Services.deploymentUnitName(duName);
             }
 
             @Override
             public DeploymentUnit getParent() {
-                throw new RuntimeException("NYI");
+                return null;
             }
 
             @Override
             public String getName() {
-                throw new RuntimeException("NYI");
+                return duName;
             }
 
             @Override

@@ -24,6 +24,7 @@ package org.jboss.as.ejb3.component;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentInterceptorFactory;
+import org.jboss.as.ee.component.EEModuleClassConfiguration;
 import org.jboss.as.ejb3.tx.CMTTxInterceptor;
 import org.jboss.ejb3.tx2.spi.TransactionalComponent;
 import org.jboss.invocation.Interceptor;
@@ -48,8 +49,8 @@ public abstract class EJBComponentConfiguration extends ComponentConfiguration {
      *
      * @param description the original component description
      */
-    public EJBComponentConfiguration(final EJBComponentDescription description) {
-        super(description, INIT_ME);
+    public EJBComponentConfiguration(final EJBComponentDescription description, final EEModuleClassConfiguration ejbModuleClassConfiguration) {
+        super(description, ejbModuleClassConfiguration);
 
         description.addDependency(EJBUtilities.SERVICE_NAME, ServiceBuilder.DependencyType.REQUIRED);
 
@@ -75,7 +76,9 @@ public abstract class EJBComponentConfiguration extends ComponentConfiguration {
     }
 
     protected void addComponentSystemInterceptorFactory(InterceptorFactory interceptorFactory) {
-        super.getComponentSystemInterceptorFactories().add(interceptorFactory);
+        throw new RuntimeException("NYI");
+        // TODO: FIXME
+        //super.getComponentSystemInterceptorFactories().add(interceptorFactory);
     }
 
     protected abstract void addCurrentInvocationContextInterceptorFactory();

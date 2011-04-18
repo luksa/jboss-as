@@ -22,6 +22,7 @@
 
 package org.jboss.as.ejb3.component.singleton;
 
+import org.jboss.as.ee.component.EEModuleClassConfiguration;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentConfiguration;
 import org.jboss.invocation.ImmediateInterceptorFactory;
 
@@ -37,8 +38,8 @@ public class SingletonComponentConfiguration extends SessionBeanComponentConfigu
      *
      * @param description the original component description
      */
-    public SingletonComponentConfiguration(final SingletonComponentDescription description) {
-        super(description);
+    public SingletonComponentConfiguration(final SingletonComponentDescription description, final EEModuleClassConfiguration ejbClassConfiguration) {
+        super(description, ejbClassConfiguration);
 
         this.initOnStartup = description.isInitOnStartup();
 

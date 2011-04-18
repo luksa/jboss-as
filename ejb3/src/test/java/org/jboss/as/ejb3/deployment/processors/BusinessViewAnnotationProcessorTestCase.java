@@ -22,6 +22,7 @@
 package org.jboss.as.ejb3.deployment.processors;
 
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.ee.component.ViewDescription;
 import org.jboss.as.ejb3.component.EJBComponentDescription;
 import org.jboss.as.ejb3.component.MethodIntf;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentDescription;
@@ -37,11 +38,13 @@ import org.junit.Test;
 import javax.ejb.Local;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.jboss.as.ejb3.TestHelper.index;
 import static org.jboss.as.ejb3.TestHelper.mockDeploymentUnit;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -87,11 +90,15 @@ public class BusinessViewAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestModule", "TestApp");
-        EJBComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        EJBComponentDescription componentDescription = new StatelessComponentDescription(MyBean.class.getSimpleName(), MyBean.class.getName(), moduleDescription, duServiceName);
         BusinessViewAnnotationProcessor processor = new BusinessViewAnnotationProcessor();
         processor.processComponentConfig(deploymentUnit, phaseContext, index, componentDescription);
 
-        assertEquals(asSet(MyInterface.class.getName()), componentDescription.getViewClassNames());
+        List<ViewDescription> views = componentDescription.getViews();
+        assertNotNull("No views found", views);
+        assertEquals("Unexpected number of views", 1, views.size());
+        assertEquals(MyInterface.class.getName(), views.get(0).getViewClassName());
         assertEquals(MethodIntf.LOCAL, componentDescription.getMethodIntf(MyInterface.class.getName()));
     }
 
@@ -109,11 +116,15 @@ public class BusinessViewAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestModule", "TestApp");
-        SessionBeanComponentDescription componentDescription = new StatelessComponentDescription(ejbClass.getSimpleName(), ejbClass.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        SessionBeanComponentDescription componentDescription = new StatelessComponentDescription(ejbClass.getSimpleName(), ejbClass.getName(), moduleDescription, duServiceName);
         BusinessViewAnnotationProcessor processor = new BusinessViewAnnotationProcessor();
         processor.processComponentConfig(deploymentUnit, phaseContext, index, componentDescription);
 
-        assertEquals(asSet(MyInterface.class.getName()), componentDescription.getViewClassNames());
+        List<ViewDescription> views = componentDescription.getViews();
+        assertNotNull("No views found", views);
+        assertEquals("Unexpected number of views", 1, views.size());
+        assertEquals(MyInterface.class.getName(), views.get(0).getViewClassName());
         assertEquals(MethodIntf.LOCAL, componentDescription.getMethodIntf(MyInterface.class.getName()));
     }
 
@@ -130,12 +141,16 @@ public class BusinessViewAnnotationProcessorTestCase {
         CompositeIndex index = new CompositeIndex(Arrays.asList(indexer.complete()));
 
         final EEModuleDescription moduleDescription = new EEModuleDescription("TestModule", "TestApp");
-        SessionBeanComponentDescription componentDescription = new StatelessComponentDescription(ImplicitNoInterfaceBean.class.getSimpleName(), ImplicitNoInterfaceBean.class.getName(), moduleDescription);
+        final ServiceName duServiceName = deploymentUnit.getServiceName();
+        SessionBeanComponentDescription componentDescription = new StatelessComponentDescription(ImplicitNoInterfaceBean.class.getSimpleName(), ImplicitNoInterfaceBean.class.getName(), moduleDescription, duServiceName);
         BusinessViewAnnotationProcessor processor = new BusinessViewAnnotationProcessor();
         processor.processComponentConfig(deploymentUnit, phaseContext, index, componentDescription);
 
         assertTrue("Bean should have no-interface view (EJB 3.1 FR 4.9.8 bullet 1.1)", componentDescription.hasNoInterfaceView());
-        assertEquals(asSet(ImplicitNoInterfaceBean.class.getName()), componentDescription.getViewClassNames());
+        List<ViewDescription> views = componentDescription.getViews();
+        assertNotNull("No views found", views);
+        assertEquals("Unexpected number of views", 1, views.size());
+        assertEquals(ImplicitNoInterfaceBean.class.getName(), views.get(0).getViewClassName());
         assertEquals(MethodIntf.LOCAL, componentDescription.getMethodIntf(ImplicitNoInterfaceBean.class.getName()));
     }
 }
