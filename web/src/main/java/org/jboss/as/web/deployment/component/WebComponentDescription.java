@@ -25,17 +25,15 @@ package org.jboss.as.web.deployment.component;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.msc.service.ServiceName;
 
 /**
  * @author Stuart Douglas
  */
 public final class WebComponentDescription extends ComponentDescription {
 
-    public WebComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription) {
-        super(componentName, componentClassName, moduleDescription, classDescription, deploymentUnitServiceName);
+    public WebComponentDescription(final String componentName, final String componentClassName, final EEModuleDescription moduleDescription, final ServiceName deploymentUnitServiceName) {
+        super(componentName, componentClassName, moduleDescription, moduleDescription.getOrAddClassByName(componentClassName), deploymentUnitServiceName);
     }
 
-    protected ComponentConfiguration constructComponentConfiguration() {
-        return new WebComponentConfiguration(this);
-    }
 }
