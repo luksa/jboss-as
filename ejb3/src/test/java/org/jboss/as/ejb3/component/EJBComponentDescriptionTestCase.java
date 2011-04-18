@@ -21,8 +21,8 @@
  */
 package org.jboss.as.ejb3.component;
 
-import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.ee.component.ViewDescription;
 import org.jboss.as.server.deployment.Services;
 import org.jboss.msc.service.ServiceName;
 import org.junit.Test;
@@ -38,11 +38,13 @@ import static org.mockito.Mockito.when;
  */
 public class EJBComponentDescriptionTestCase {
     private static class TestBean {
-        public void someMethod() {}
+        public void someMethod() {
+        }
     }
 
     /**
      * If a bean is BMT then txAttrs won't be available.
+     *
      * @throws Exception
      */
     @Test
@@ -50,12 +52,17 @@ public class EJBComponentDescriptionTestCase {
         final EJBComponentConfiguration configuration = mock(EJBComponentConfiguration.class);
         when(configuration.getTransactionManagementType()).thenReturn(TransactionManagementType.BEAN);
 
-        final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp","TestModule");
+        final EEModuleDescription moduleDescription = new EEModuleDescription("TestApp", "TestModule");
         final ServiceName duServiceName = Services.deploymentUnitName("Dummy Deployment Unit");
         final EJBComponentDescription description = new EJBComponentDescription("Test", "TestBean", moduleDescription, duServiceName) {
             @Override
             public MethodIntf getMethodIntf(String viewClassName) {
                 return MethodIntf.LOCAL;
+            }
+
+            @Override
+            protected void addCurrentInvocationContextFactory(ViewDescription view) {
+                // no-op
             }
         };
         Class<?> viewClass = TestBean.class;

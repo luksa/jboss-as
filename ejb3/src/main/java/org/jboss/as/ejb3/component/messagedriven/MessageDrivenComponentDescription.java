@@ -21,10 +21,18 @@
  */
 package org.jboss.as.ejb3.component.messagedriven;
 
+import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.ee.component.ViewConfiguration;
+import org.jboss.as.ee.component.ViewConfigurator;
 import org.jboss.as.ee.component.ViewDescription;
 import org.jboss.as.ejb3.component.EJBComponentDescription;
 import org.jboss.as.ejb3.component.MethodIntf;
+import org.jboss.as.ejb3.component.pool.PooledInstanceInterceptor;
+import org.jboss.as.server.deployment.DeploymentPhaseContext;
+import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.invocation.ImmediateInterceptorFactory;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -87,6 +95,44 @@ public class MessageDrivenComponentDescription extends EJBComponentDescription {
     }
 
     public void setResourceAdapterName(String resourceAdapterName) {
+        if (resourceAdapterName == null || resourceAdapterName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Resource adapter name cannot be null or empty");
+        }
         this.resourceAdapterName = resourceAdapterName;
+        // setup the dependency
+        String raDeploymentName = resourceAdapterName;
+        // See RaDeploymentParsingProcessor
+        if (this.resourceAdapterName.endsWith(".rar")) {
+            raDeploymentName = this.resourceAdapterName.substring(0, resourceAdapterName.indexOf(".rar"));
+        }
+        // See ResourceAdapterDeploymentService
+        ServiceName raServiceName = ServiceName.of(raDeploymentName);
+        this.addDependency(raServiceName, ServiceBuilder.DependencyType.REQUIRED);
+    }
+
+    @Override
+    protected void setupViewInterceptors(ViewDescription view) {
+        // let the super do its job
+        super.setupViewInterceptors(view);
+
+        // add the instance associating interceptor at the start of the interceptor chain
+        view.getConfigurators().add(new ViewConfigurator() {
+            @Override
+            public void configure(DeploymentPhaseContext context, ComponentConfiguration componentConfiguration, ViewDescription description, ViewConfiguration configuration) throws DeploymentUnitProcessingException {
+                configuration.addViewInterceptor(PooledInstanceInterceptor.pooled());
+            }
+        });
+
+    }
+
+    @Override
+    protected void addCurrentInvocationContextFactory(ViewDescription view) {
+        view.getConfigurators().add(new ViewConfigurator() {
+            @Override
+            public void configure(DeploymentPhaseContext context, ComponentConfiguration componentConfiguration, ViewDescription description, ViewConfiguration configuration) throws DeploymentUnitProcessingException {
+                // current invocation context interceptor for MDBs
+                configuration.addViewInterceptor(new ImmediateInterceptorFactory(MessageDrivenInvocationContextInterceptor.INSTANCE));
+            }
+        });
     }
 }
