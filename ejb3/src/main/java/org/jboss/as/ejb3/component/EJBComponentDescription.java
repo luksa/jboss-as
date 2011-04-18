@@ -21,14 +21,10 @@
  */
 package org.jboss.as.ejb3.component;
 
-import org.jboss.as.ee.component.ComponentConfiguration;
-import org.jboss.as.ee.component.ComponentConfigurator;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentNamingMode;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ee.component.ViewDescription;
-import org.jboss.as.server.deployment.DeploymentPhaseContext;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 
@@ -233,5 +229,13 @@ public abstract class EJBComponentDescription extends ComponentDescription {
             result[i] = a[i].getName();
         }
         return result;
+    }
+
+    protected void setupViewInterceptors(ViewDescription view) {
+
+    }
+
+    protected void setupClientViewInterceptors(ViewDescription view) {
+
     }
 }

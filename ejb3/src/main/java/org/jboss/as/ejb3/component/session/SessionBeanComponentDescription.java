@@ -24,6 +24,7 @@ package org.jboss.as.ejb3.component.session;
 
 import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentConfiguration;
+import org.jboss.as.ee.component.ComponentInterceptorFactory;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ee.component.ViewConfiguration;
 import org.jboss.as.ee.component.ViewConfigurator;
@@ -38,7 +39,6 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.ejb3.tx2.spi.TransactionalComponent;
 import org.jboss.invocation.Interceptor;
-import org.jboss.invocation.InterceptorFactory;
 import org.jboss.invocation.InterceptorFactoryContext;
 import org.jboss.invocation.proxy.MethodIdentifier;
 import org.jboss.logging.Logger;
@@ -63,7 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class SessionBeanComponentDescription extends EJBComponentDescription {
 
     private static final Logger logger = Logger.getLogger(SessionBeanComponentDescription.class);
-    
+
     /**
      * Flag marking the presence/absence of a no-interface view on the session bean
      */
@@ -158,8 +158,10 @@ public abstract class SessionBeanComponentDescription extends EJBComponentDescri
             ViewDescription viewDescription = new ViewDescription(this, viewClassName);
             this.getViews().add(viewDescription);
 
-            // add the tx interceptor for the view
-            this.addTxManagementInterceptorForView(viewDescription);
+            // setup server side view interceptors
+            this.setupViewInterceptors(viewDescription);
+            // setup client side view interceptors
+            this.setupClientViewInterceptors(viewDescription);
         }
     }
 
@@ -174,8 +176,10 @@ public abstract class SessionBeanComponentDescription extends EJBComponentDescri
         // setup the ViewDescription
         ViewDescription viewDescription = new ViewDescription(this, this.getEJBClassName());
         this.getViews().add(viewDescription);
-        // add the tx interceptor for the view
-        this.addTxManagementInterceptorForView(viewDescription);
+        // setup server side view interceptors
+        this.setupViewInterceptors(viewDescription);
+        // setup client side view interceptors
+        this.setupClientViewInterceptors(viewDescription);
 
     }
 
@@ -194,9 +198,10 @@ public abstract class SessionBeanComponentDescription extends EJBComponentDescri
             // setup the ViewDescription
             ViewDescription viewDescription = new ViewDescription(this, viewClassName);
             this.getViews().add(viewDescription);
-            // add the tx interceptor for the view
-            this.addTxManagementInterceptorForView(viewDescription);
-
+            // setup server side view interceptors
+            this.setupViewInterceptors(viewDescription);
+            // setup client side view interceptors
+            this.setupClientViewInterceptors(viewDescription);
         }
     }
 
@@ -431,12 +436,21 @@ public abstract class SessionBeanComponentDescription extends EJBComponentDescri
         return new EJBBusinessMethod(methodName, paramTypes);
     }
 
+    @Override
+    protected void setupViewInterceptors(ViewDescription view) {
+        // let super do it's job first
+        super.setupViewInterceptors(view);
+
+        // tx management interceptor(s)
+        this.addTxManagementInterceptorForView(view);
+    }
+
     /**
      * Sets up the transaction management interceptor for all methods of the passed view.
-     * 
+     *
      * @param view The EJB bean view
      */
-    private void addTxManagementInterceptorForView(ViewDescription view) {
+    protected void addTxManagementInterceptorForView(ViewDescription view) {
         // add a Tx configurator
         view.getConfigurators().add(new ViewConfigurator() {
             @Override
@@ -444,13 +458,9 @@ public abstract class SessionBeanComponentDescription extends EJBComponentDescri
                 EJBComponentDescription ejbComponentDescription = (EJBComponentDescription) componentConfiguration.getComponentDescription();
                 // Add CMT interceptor factory
                 if (TransactionManagementType.CONTAINER.equals(ejbComponentDescription.getTransactionManagementType())) {
-                    configuration.addViewInterceptor(new InterceptorFactory() {
+                    configuration.addViewInterceptor(new ComponentInterceptorFactory() {
                         @Override
-                        public Interceptor create(InterceptorFactoryContext context) {
-                            Component component = (Component) context.getContextData().get(Component.class);
-                            if (component == null) {
-                                throw new IllegalStateException("Component not set in InterceptorFactoryContext: " + context);
-                            }
+                        protected Interceptor create(Component component, InterceptorFactoryContext context) {
                             if (component instanceof TransactionalComponent == false) {
                                 throw new IllegalArgumentException("Component " + component + " with component class: " + component.getComponentClass() +
                                         " isn't a transactional component. Tx interceptors cannot be applied");
