@@ -90,6 +90,10 @@
             <maven-resource group="ch.qos.cal10n" artifact="cal10n-api"/>
         </module-def>
 
+        <module-def name="com.google.appengine">
+            <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk" />
+        </module-def>
+
         <module-def name="com.google.guava">
             <maven-resource group="com.google.guava" artifact="guava" />
         </module-def>
@@ -629,6 +633,10 @@
 
         <module-def name="org.jboss.as.threads">
             <maven-resource group="org.jboss.as" artifact="jboss-as-threads"/>
+        </module-def>
+
+        <module-def name="org.jboss.capedwarf">
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-datastore"/>
         </module-def>
 
         <module-def name="org.jboss.classfilewriter">
