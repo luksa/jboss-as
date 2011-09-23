@@ -133,7 +133,7 @@
             </session-bean>
 
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:1.0" default-cache-container="hibernate">
+        <subsystem xmlns="urn:jboss:domain:infinispan:1.0" default-cache-container="capedwarf">
             <cache-container name="hibernate" default-cache="local-query">
                 <local-cache name="entity">
                     <eviction strategy="LRU" max-entries="10000"/>
@@ -146,6 +146,11 @@
                 <local-cache name="timestamps">
                     <eviction strategy="NONE"/>
                 </local-cache>
+            </cache-container>
+            <cache-container name="capedwarf" default-cache="default">
+                <replicated-cache name="default" mode="ASYNC" batching="true" start="EAGER">
+                    <locking isolation="REPEATABLE_READ"/>
+                </replicated-cache>
             </cache-container>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>

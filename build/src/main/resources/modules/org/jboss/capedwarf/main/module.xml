@@ -28,6 +28,7 @@
     </resources>
 
     <dependencies>
+        <module name="javax.api"/>
         <module name="org.javassist"/>
         <module name="org.infinispan"/>
         <module name="com.google.appengine"/>
