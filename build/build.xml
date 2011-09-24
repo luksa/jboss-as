@@ -636,7 +636,9 @@
         </module-def>
 
         <module-def name="org.jboss.capedwarf">
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-common"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-datastore"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-mail"/>
         </module-def>
 
         <module-def name="org.jboss.classfilewriter">
