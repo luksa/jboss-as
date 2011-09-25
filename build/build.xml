@@ -639,6 +639,8 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-common"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-datastore"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-mail"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-urlfetch"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-users"/>
         </module-def>
 
         <module-def name="org.jboss.classfilewriter">
