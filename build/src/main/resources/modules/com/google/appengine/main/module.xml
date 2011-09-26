@@ -24,11 +24,17 @@
 
 <module xmlns="urn:jboss:module:1.0" name="com.google.appengine">
     <resources>
-        <!-- Insert resources here -->
+        <resource-root path="appengine-api-1.0-sdk-1.5.4.jar">
+           <filter>
+               <include path="com/google/**"/>
+               <exclude path="**"/>
+           </filter>
+        </resource-root>
     </resources>
 
     <dependencies>
         <module name="javax.api"/>
+        <module name="javax.mail.api"/>
         <module name="org.jboss.capedwarf"/>
     </dependencies>
 </module>

@@ -29,6 +29,7 @@
 
     <dependencies>
         <module name="javax.api"/>
+        <module name="javax.mail.api"/>
         <module name="org.javassist"/>
         <module name="org.infinispan"/>
         <module name="org.apache.httpcomponents"/>
