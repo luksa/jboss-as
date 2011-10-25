@@ -602,25 +602,21 @@
                 <dependency>
                     <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-core-asl</artifactId>
-                    <version>${version.org.codehaus.jackson}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-mapper-asl</artifactId>
-                    <version>${version.org.codehaus.jackson}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-jaxrs</artifactId>
-                    <version>${version.org.codehaus.jackson}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-xc</artifactId>
-                    <version>${version.org.codehaus.jackson}</version>
                 </dependency>
 
                 <dependency>
@@ -1609,6 +1605,50 @@
                     <artifactId>xom</artifactId>
                 </dependency>
 
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-blobstore</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-common</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-datastore</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-files</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-images</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-mail</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-urlfetch</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-users</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.google.appengine</groupId>
+                    <artifactId>appengine-api-1.0-sdk</artifactId>
+                </dependency>
             </dependencies>
 
             <properties>

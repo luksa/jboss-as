@@ -191,6 +191,17 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
+            <cache-container name="capedwarf" default-cache="default">
+                <replicated-cache name="default" mode="ASYNC" batching="true" start="EAGER" indexing="LOCAL">
+                    <locking isolation="REPEATABLE_READ"/>
+                </replicated-cache>
+                <replicated-cache name="data" mode="ASYNC">
+                    <locking isolation="REPEATABLE_READ"/>
+                </replicated-cache>
+                <replicated-cache name="metadata" mode="ASYNC">
+                    <locking isolation="REPEATABLE_READ"/>
+                </replicated-cache>
+            </cache-container>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jacorb:1.1"/>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
