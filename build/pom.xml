@@ -249,6 +249,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>
@@ -469,6 +474,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.neethi</groupId>
             <artifactId>neethi</artifactId>
         </dependency>
@@ -554,6 +564,11 @@
 
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-engine</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-envers</artifactId>
         </dependency>
 
@@ -580,6 +595,11 @@
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-query</artifactId>
         </dependency>
 
         <dependency>
@@ -1532,6 +1552,51 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-blobstore</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-datastore</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-files</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-images</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-urlfetch</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-users</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
         </dependency>
 
     </dependencies>
