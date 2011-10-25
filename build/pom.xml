@@ -1722,6 +1722,11 @@
 
                 <dependency>
                     <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-memcache</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
                     <artifactId>capedwarf-urlfetch</artifactId>
                 </dependency>
 
