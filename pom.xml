@@ -85,6 +85,7 @@
         <version.commons-lang>2.4</version.commons-lang>
         <version.commons-pool>1.5.6</version.commons-pool>
         <version.com.google.guava>10.0.1</version.com.google.guava>
+        <version.com.google.appengine>1.5.5</version.com.google.appengine>
         <version.com.h2database>1.3.161</version.com.h2database>
         <version.dom4j>1.6.1</version.dom4j>
         <version.gnu.getopt>1.0.13</version.gnu.getopt>
@@ -109,6 +110,10 @@
         <version.net.sourceforge.htmlunit>2.8</version.net.sourceforge.htmlunit>
         <version.net.sourceforge.nekohtml>1.9.14</version.net.sourceforge.nekohtml>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
+        <version.org.apache.aries.jmx>0.3</version.org.apache.aries.jmx>
+        <version.org.apache.avro>1.5.1</version.org.apache.avro>
+        <version.org.apache.ant>1.8.2</version.org.apache.ant>
+        <version.org.apache.ant.bsf>1.8.2</version.org.apache.ant.bsf>
         <version.org.apache.cxf>2.4.6</version.org.apache.cxf>
         <version.org.apache.cxf.xjcplugins>2.4.0</version.org.apache.cxf.xjcplugins>
         <version.org.apache.felix.configadmin>1.2.8</version.org.apache.felix.configadmin>
@@ -116,6 +121,7 @@
         <version.org.apache.james.apache-mime4j>0.6</version.org.apache.james.apache-mime4j>
         <version.org.apache.httpcomponents.httpclient>4.1.2</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.1.4</version.org.apache.httpcomponents.httpcore>
+        <version.org.apache.lucene>3.4.0</version.org.apache.lucene>
         <version.org.apache.neethi>3.0.1</version.org.apache.neethi>
         <version.org.apache.openjpa>2.1.1</version.org.apache.openjpa>
         <version.org.apache.santuario>1.4.5</version.org.apache.santuario>
@@ -133,6 +139,7 @@
         <version.org.hibernate>4.0.1.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>4.0.1.Final</version.org.hibernate.commons.annotations>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
+        <version.org.hibernate.search>4.0.0.CR1</version.org.hibernate.search>
         <version.org.hibernate.validator>4.2.0.Final</version.org.hibernate.validator>
         <version.org.hornetq>2.2.11.Final</version.org.hornetq>
         <version.org.infinispan>5.1.1.FINAL</version.org.infinispan>
@@ -142,6 +149,7 @@
         <version.org.jboss.arquillian.osgi>1.0.0</version.org.jboss.arquillian.osgi>
         <version.org.jboss.as.console>1.0.2.Final</version.org.jboss.as.console>
         <version.org.jboss.as.jbossweb-native>2.0.10.Final</version.org.jboss.as.jbossweb-native>
+        <version.org.jboss.capedwarf>1.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.org.jboss.classfilewriter>1.0.0.Final</version.org.jboss.classfilewriter>
         <version.org.jboss.common-core>2.2.17.GA</version.org.jboss.common-core>
         <version.org.jboss.com.sun.httpserver>1.0.0.Final</version.org.jboss.com.sun.httpserver>
@@ -1518,6 +1526,12 @@
             </dependency>
 
             <dependency>
+               <groupId>org.apache.avro</groupId>
+               <artifactId>avro</artifactId>
+               <version>${version.org.apache.avro}</version>
+            </dependency>
+
+            <dependency>
                <groupId>org.apache.ant</groupId>
                <artifactId>ant</artifactId>
                <version>${version.org.apache.ant}</version>
@@ -2695,6 +2709,18 @@
 
             <dependency>
                 <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.eventadmin</artifactId>
+                <version>${version.org.apache.felix.eventadmin}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>concurrent</groupId>
+                        <artifactId>concurrent</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.log</artifactId>
                 <exclusions>
                     <exclusion>
@@ -2707,6 +2733,44 @@
                     </exclusion>
                 </exclusions>
                 <version>${version.org.apache.felix.log}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.metatype</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>net.sf.kxml</groupId>
+                        <artifactId>kxml2</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>org.osgi.core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>org.osgi.compendium</artifactId>
+                    </exclusion>
+                </exclusions>
+                <version>${version.org.apache.felix.metatype}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr</artifactId>
+                <version>${version.org.apache.felix.scr}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.webconsole</artifactId>
+                <version>${version.org.apache.felix.webconsole}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
 
             <dependency>
@@ -3093,6 +3157,18 @@
 
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-engine</artifactId>
+                <version>${version.org.hibernate.search}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-search-analyzers</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${version.org.hibernate.validator}</version>
             </dependency>
@@ -3216,6 +3292,12 @@
                         <artifactId>commons-pool</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-query</artifactId>
+                <version>${version.org.infinispan}</version>
             </dependency>
 
             <dependency>
@@ -5878,6 +5960,63 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- CapeDwarf & GAE -->
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-blobstore</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-common</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-datastore</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-files</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-images</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-mail</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-urlfetch</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-users</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-1.0-sdk</artifactId>
+                <version>${version.com.google.appengine}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
