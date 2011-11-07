@@ -134,6 +134,11 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -1480,6 +1485,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openid4java</groupId>
+            <artifactId>openid4java-consumer</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
@@ -1502,6 +1512,11 @@
         <dependency>
             <groupId>org.picketbox</groupId>
             <artifactId>picketbox-infinispan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.picketlink</groupId>
+            <artifactId>picketlink-fed-api</artifactId>
         </dependency>
 
         <dependency>
