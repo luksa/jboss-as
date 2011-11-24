@@ -1776,6 +1776,11 @@
 
                 <dependency>
                     <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-bytecode</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
                     <artifactId>capedwarf-capabilities</artifactId>
                 </dependency>
 
