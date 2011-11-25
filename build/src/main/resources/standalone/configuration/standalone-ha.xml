@@ -3,6 +3,7 @@
 <server xmlns="urn:jboss:domain:1.1">
 
     <extensions>
+        <extension module="org.jboss.as.capedwarf"/>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
         <extension module="org.jboss.as.configadmin"/>
@@ -55,6 +56,7 @@
     </management>
 
     <profile>
+        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0" appengine-api="appengine-api" />
         <subsystem xmlns="urn:jboss:domain:logging:1.1">
             <console-handler name="CONSOLE">
                 <level name="INFO"/>
