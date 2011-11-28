@@ -6,6 +6,7 @@
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
         <extension module="org.jboss.as.connector"/>
+        <extension module="org.jboss.as.capedwarf"/>
         <extension module="org.jboss.as.deployment-scanner"/>
         <extension module="org.jboss.as.ee"/>
         <extension module="org.jboss.as.ejb3"/>
@@ -455,7 +456,8 @@
                 </jaxwsconfig:pre-handler-chains>
             </endpoint-config>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:weld:1.0" />
+        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0" />
     </profile>
 
     <interfaces>
