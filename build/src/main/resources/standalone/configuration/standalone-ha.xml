@@ -7,7 +7,6 @@
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
         <extension module="org.jboss.as.connector"/>
-        <extension module="org.jboss.as.capedwarf"/>
         <extension module="org.jboss.as.deployment-scanner"/>
         <extension module="org.jboss.as.ee"/>
         <extension module="org.jboss.as.ejb3"/>
@@ -52,7 +51,6 @@
     </management>
 
     <profile>
-        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0" appengine-api="appengine-api" />
         <subsystem xmlns="urn:jboss:domain:logging:1.1">
             <console-handler name="CONSOLE">
                 <level name="INFO"/>
@@ -213,16 +211,16 @@
             <bean-validation enabled="false"/>
             <default-workmanager>
                 <short-running-threads blocking="true">
-                <core-threads count="10" per-cpu="20"/>
-                        <queue-length count="10" per-cpu="20"/>
-                        <max-threads count="10" per-cpu="20"/>
-                        <keepalive-time time="10" unit="seconds"/>
+                    <core-threads count="10" per-cpu="20"/>
+                    <queue-length count="10" per-cpu="20"/>
+                    <max-threads count="10" per-cpu="20"/>
+                    <keepalive-time time="10" unit="seconds"/>
                 </short-running-threads>
                 <long-running-threads blocking="true">
-                        <core-threads count="10" per-cpu="20"/>
-                        <queue-length count="10" per-cpu="20"/>
-                        <max-threads count="10" per-cpu="20"/>
-                        <keepalive-time time="10" unit="seconds"/>
+                    <core-threads count="10" per-cpu="20"/>
+                    <queue-length count="10" per-cpu="20"/>
+                    <max-threads count="10" per-cpu="20"/>
+                    <keepalive-time time="10" unit="seconds"/>
                 </long-running-threads>
             </default-workmanager>
         </subsystem>
@@ -268,7 +266,7 @@
         <subsystem xmlns="urn:jboss:domain:jmx:1.1">
             <show-model value="true"/>
         </subsystem>
-         <subsystem xmlns="urn:jboss:domain:jpa:1.0">
+        <subsystem xmlns="urn:jboss:domain:jpa:1.0">
             <jpa default-datasource=""/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:mail:1.0">
@@ -285,29 +283,29 @@
                 <journal-min-files>2</journal-min-files>
 
                 <connectors>
-                   <netty-connector name="netty" socket-binding="messaging"/>
-                   <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
-                      <param key="batch-delay" value="50"/>
-                   </netty-connector>
-                   <in-vm-connector name="in-vm" server-id="0"/>
+                    <netty-connector name="netty" socket-binding="messaging"/>
+                    <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
+                        <param key="batch-delay" value="50"/>
+                    </netty-connector>
+                    <in-vm-connector name="in-vm" server-id="0"/>
                 </connectors>
 
                 <acceptors>
-                   <netty-acceptor name="netty" socket-binding="messaging"/>
-                   <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">
-                      <param key="batch-delay" value="50"/>
-                      <param key="direct-deliver" value="false"/>
-                   </netty-acceptor>
-                   <in-vm-acceptor name="in-vm" server-id="0"/>
+                    <netty-acceptor name="netty" socket-binding="messaging"/>
+                    <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">
+                        <param key="batch-delay" value="50"/>
+                        <param key="direct-deliver" value="false"/>
+                    </netty-acceptor>
+                    <in-vm-acceptor name="in-vm" server-id="0"/>
                 </acceptors>
 
                 <security-settings>
-                   <security-setting match="#">
+                    <security-setting match="#">
                         <permission type="send" roles="guest"/>
                         <permission type="consume" roles="guest"/>
                         <permission type="createNonDurableQueue" roles="guest"/>
                         <permission type="deleteNonDurableQueue" roles="guest"/>
-                   </security-setting>
+                    </security-setting>
                 </security-settings>
 
                 <address-settings>
@@ -324,39 +322,39 @@
 
                 <!--JMS Stuff-->
                 <jms-connection-factories>
-                  <connection-factory name="InVmConnectionFactory">
-                      <connectors>
-                          <connector-ref connector-name="in-vm"/>
-                      </connectors>
-                      <entries>
-                          <entry name="java:/ConnectionFactory"/>
-                      </entries>
-                  </connection-factory>
-                  <connection-factory name="RemoteConnectionFactory">
-                      <connectors>
-                          <connector-ref connector-name="netty"/>
-                      </connectors>
-                      <entries>
-                          <entry name="RemoteConnectionFactory"/>
-                      </entries>
-                  </connection-factory>
-                  <pooled-connection-factory name="hornetq-ra">
-                      <transaction mode="xa"/>
-                      <connectors>
-                          <connector-ref connector-name="in-vm"/>
-                      </connectors>
-                      <entries>
-                          <entry name="java:/JmsXA"/>
-                      </entries>
+                    <connection-factory name="InVmConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="in-vm"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:/ConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <connection-factory name="RemoteConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="netty"/>
+                        </connectors>
+                        <entries>
+                            <entry name="RemoteConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <pooled-connection-factory name="hornetq-ra">
+                        <transaction mode="xa"/>
+                        <connectors>
+                            <connector-ref connector-name="in-vm"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:/JmsXA"/>
+                        </entries>
                     </pooled-connection-factory>
                 </jms-connection-factories>
 
                 <jms-destinations>
                     <jms-queue name="testQueue">
-                       <entry name="queue/test"/>
+                        <entry name="queue/test"/>
                     </jms-queue>
                     <jms-topic name="testTopic">
-                       <entry name="topic/test"/>
+                        <entry name="topic/test"/>
                     </jms-topic>
                 </jms-destinations>
             </hornetq-server>
@@ -431,8 +429,8 @@
         <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host">
             <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
             <virtual-server name="default-host" enable-welcome-root="true">
-               <alias name="localhost"/>
-               <alias name="example.com"/>
+                <alias name="localhost"/>
+                <alias name="example.com"/>
             </virtual-server>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:webservices:1.0" xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:jaxwsconfig="urn:jboss:jbossws-jaxws-config:4.0">
@@ -449,7 +447,7 @@
                 <jaxwsconfig:config-name>Recording-Endpoint-Config</jaxwsconfig:config-name>
                 <jaxwsconfig:pre-handler-chains>
                     <javaee:handler-chain xmlns="http://java.sun.com/xml/ns/javaee">
-                            <javaee:protocol-bindings>##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM</javaee:protocol-bindings>
+                        <javaee:protocol-bindings>##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM</javaee:protocol-bindings>
                         <javaee:handler>
                             <javaee:handler-name>RecordingHandler</javaee:handler-name>
                             <javaee:handler-class>org.jboss.ws.common.invocation.RecordingServerHandler</javaee:handler-class>
@@ -458,8 +456,8 @@
                 </jaxwsconfig:pre-handler-chains>
             </endpoint-config>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:weld:1.0" />
-        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0" />
+        <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0"/>
     </profile>
 
     <interfaces>
@@ -496,4 +494,3 @@
         </outbound-socket-binding>
     </socket-binding-group>
 </server>
-
