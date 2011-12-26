@@ -203,7 +203,7 @@
                 </replicated-cache>
             </cache-container>
             <cache-container name="capedwarf" default-cache="default">
-                <replicated-cache name="default" mode="ASYNC" batching="true" indexing="LOCAL">
+                <replicated-cache name="default" mode="ASYNC" batching="true" start="EAGER" indexing="LOCAL">
                     <locking isolation="REPEATABLE_READ"/>
                 </replicated-cache>
                 <replicated-cache name="data" mode="ASYNC">
