@@ -5762,6 +5762,12 @@
 
             <dependency>
                 <groupId>org.picketlink</groupId>
+                <artifactId>picketlink-openid</artifactId>
+                <version>${version.org.picketlink}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.picketlink</groupId>
                 <artifactId>picketlink-bindings</artifactId>
                 <version>${version.org.picketlink}</version>
                 <exclusions>
