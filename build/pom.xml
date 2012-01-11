@@ -146,7 +146,7 @@
 
         <dependency>
             <groupId>org.picketlink</groupId>
-            <artifactId>picketlink-openid</artifactId>
+            <artifactId>picketlink-consolidated-social</artifactId>
         </dependency>
 
         <dependency>
