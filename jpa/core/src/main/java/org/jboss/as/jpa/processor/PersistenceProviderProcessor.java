@@ -100,7 +100,6 @@ public class PersistenceProviderProcessor implements DeploymentUnitProcessor {
                     try {
                         adaptor = (PersistenceProviderAdaptor) deploymentModuleClassLoader.loadClass(adapterClass).newInstance();
                         adaptor.injectJtaManager(JtaManagerImpl.getInstance());
-                        deploymentUnit.putAttachment(JpaAttachments.DEPLOYED_PERSISTENCE_PROVIDER, new PersistenceProviderDeploymentHolder(providerList, adaptor));
                     } catch (InstantiationException e) {
                         throw MESSAGES.cannotCreateAdapter(e, adapterClass);
                     } catch (IllegalAccessException e) {
@@ -108,6 +107,7 @@ public class PersistenceProviderProcessor implements DeploymentUnitProcessor {
                     } catch (ClassNotFoundException e) {
                         throw MESSAGES.cannotCreateAdapter(e, adapterClass);
                     }
+                    deploymentUnit.putAttachment(JpaAttachments.DEPLOYED_PERSISTENCE_PROVIDER, new PersistenceProviderDeploymentHolder(providerList, adaptor));
                 }
             }
         }
