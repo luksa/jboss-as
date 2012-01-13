@@ -22,15 +22,6 @@
 
 package org.jboss.as.jpa.processor;
 
-import static org.jboss.as.jpa.JpaLogger.ROOT_LOGGER;
-import static org.jboss.as.jpa.JpaMessages.MESSAGES;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.spi.PersistenceProvider;
-
 import org.jboss.as.jpa.config.PersistenceProviderDeploymentHolder;
 import org.jboss.as.jpa.spi.PersistenceProviderAdaptor;
 import org.jboss.as.jpa.transaction.JtaManagerImpl;
@@ -42,6 +33,14 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.server.deployment.ServicesAttachment;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleClassLoader;
+
+import javax.persistence.spi.PersistenceProvider;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.jboss.as.jpa.JpaLogger.ROOT_LOGGER;
+import static org.jboss.as.jpa.JpaMessages.MESSAGES;
 
 /**
  * Deploy JPA Persistence providers that are found in the application deployment.
@@ -83,7 +82,6 @@ public class PersistenceProviderProcessor implements DeploymentUnitProcessor {
                     try {
                         adaptor = (PersistenceProviderAdaptor) deploymentModuleClassLoader.loadClass(adapterClass).newInstance();
                         adaptor.injectJtaManager(JtaManagerImpl.getInstance());
-                        deploymentUnit.putAttachment(JpaAttachments.DEPLOYED_PERSISTENCE_PROVIDER, new PersistenceProviderDeploymentHolder(providerList, adaptor));
                     } catch (InstantiationException e) {
                         throw MESSAGES.cannotCreateAdapter(e, adapterClass);
                     } catch (IllegalAccessException e) {
@@ -92,9 +90,8 @@ public class PersistenceProviderProcessor implements DeploymentUnitProcessor {
                         throw MESSAGES.cannotCreateAdapter(e, adapterClass);
                     }
                 }
+                deploymentUnit.putAttachment(JpaAttachments.DEPLOYED_PERSISTENCE_PROVIDER, new PersistenceProviderDeploymentHolder(providerList, adaptor));
             }
-
-
         }
     }
 

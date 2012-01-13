@@ -204,13 +204,19 @@
             </cache-container>
             <cache-container name="capedwarf" default-cache="default">
                 <replicated-cache name="default" mode="ASYNC" batching="true" indexing="LOCAL">
+                    <transaction mode="NON_XA"/>
                     <locking isolation="REPEATABLE_READ"/>
+                    <eviction strategy="NONE"/>
                 </replicated-cache>
                 <replicated-cache name="data" mode="ASYNC">
+                    <transaction mode="NON_XA"/>
                     <locking isolation="REPEATABLE_READ"/>
+                    <eviction strategy="NONE"/>
                 </replicated-cache>
                 <replicated-cache name="metadata" mode="ASYNC">
+                    <transaction mode="NON_XA"/>
                     <locking isolation="REPEATABLE_READ"/>
+                    <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
         </subsystem>
@@ -430,7 +436,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
             <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
-            <virtual-server name="default-host" enable-welcome-root="true">
+            <virtual-server name="default-host" enable-welcome-root="false">
                 <alias name="localhost"/>
                 <alias name="example.com"/>
             </virtual-server>
