@@ -22,14 +22,14 @@
 
 package org.jboss.as.jpa.persistenceprovider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jboss.as.jpa.JpaMessages;
 
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceProviderResolver;
-
-import org.jboss.as.jpa.JpaMessages;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Implementation of PersistenceProviderResolver
@@ -39,7 +39,7 @@ import org.jboss.as.jpa.JpaMessages;
  */
 public class PersistenceProviderResolverImpl implements PersistenceProviderResolver {
 
-    private List<Class> providers = new CopyOnWriteArrayList<Class>();
+    private Set<Class> providers = new CopyOnWriteArraySet<Class>();
 
     private static final PersistenceProviderResolverImpl INSTANCE = new PersistenceProviderResolverImpl();
 
@@ -79,7 +79,7 @@ public class PersistenceProviderResolverImpl implements PersistenceProviderResol
     }
 
     public void removePersistenceProvider(PersistenceProvider persistenceProvider) {
-
+        providers.remove(persistenceProvider.getClass());
     }
 
 }
