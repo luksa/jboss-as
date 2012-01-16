@@ -205,17 +205,14 @@
             <cache-container name="capedwarf" default-cache="default">
                 <replicated-cache name="default" mode="ASYNC" batching="true" indexing="LOCAL">
                     <transaction mode="NON_XA"/>
-                    <locking isolation="REPEATABLE_READ"/>
                     <eviction strategy="NONE"/>
                 </replicated-cache>
                 <replicated-cache name="data" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <locking isolation="REPEATABLE_READ"/>
                     <eviction strategy="NONE"/>
                 </replicated-cache>
                 <replicated-cache name="metadata" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <locking isolation="REPEATABLE_READ"/>
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>

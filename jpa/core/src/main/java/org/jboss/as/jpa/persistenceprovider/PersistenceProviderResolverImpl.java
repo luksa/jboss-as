@@ -22,8 +22,6 @@
 
 package org.jboss.as.jpa.persistenceprovider;
 
-import org.jboss.as.jpa.JpaMessages;
-
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceProviderResolver;
 import java.util.ArrayList;
@@ -34,12 +32,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Implementation of PersistenceProviderResolver
  * TODO:  look at forking/merging with Hibernate javax.persistence.spi.PersistenceProviderResolverHolder.PersistenceProviderResolverPerClassLoader
+ * TODO -- this needs a better impl, as per-app-bundled JPA doesn't really properly work
  *
  * @author Scott Marlow
+ * @author Ales Justin
  */
 public class PersistenceProviderResolverImpl implements PersistenceProviderResolver {
 
-    private Set<Class> providers = new CopyOnWriteArraySet<Class>();
+    private Set<PersistenceProvider> providers = new CopyOnWriteArraySet<PersistenceProvider>();
 
     private static final PersistenceProviderResolverImpl INSTANCE = new PersistenceProviderResolverImpl();
 
@@ -47,39 +47,28 @@ public class PersistenceProviderResolverImpl implements PersistenceProviderResol
         return INSTANCE;
     }
 
-    public PersistenceProviderResolverImpl() {
+    private PersistenceProviderResolverImpl() {
     }
 
     /**
-     * Return a new instance of each persistence provider class
-     * @return
+     * Return a copy of providers set.
+     *
+     * @return new providers list
      */
-    @Override
     public List<PersistenceProvider> getPersistenceProviders() {
-         List<PersistenceProvider> providersCopy = new ArrayList<PersistenceProvider>(providers.size());
-        for (Class providerClass: providers) {
-            try {
-                providersCopy.add((PersistenceProvider) providerClass.newInstance());
-            } catch (InstantiationException e) {
-                throw JpaMessages.MESSAGES.couldNotCreateInstanceProvider(e, providerClass.getName());
-            } catch (IllegalAccessException e) {
-                throw JpaMessages.MESSAGES.couldNotCreateInstanceProvider(e, providerClass.getName());
-            }
-        }
-        return providersCopy;
+        return new ArrayList<PersistenceProvider>(providers);
     }
 
-    @Override
     public void clearCachedProviders() {
         providers.clear();
     }
 
     public void addPersistenceProvider(PersistenceProvider persistenceProvider) {
-        providers.add(persistenceProvider.getClass());
+        providers.add(persistenceProvider);
     }
 
     public void removePersistenceProvider(PersistenceProvider persistenceProvider) {
-        providers.remove(persistenceProvider.getClass());
+        providers.remove(persistenceProvider);
     }
 
 }
