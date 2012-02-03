@@ -362,6 +362,9 @@
                     <jms-queue name="testQueue">
                         <entry name="queue/test"/>
                     </jms-queue>
+                    <jms-queue name="capedwarfQueue">
+                        <entry name="queue/capedwarf"/>
+                    </jms-queue>
                     <jms-topic name="testTopic">
                         <entry name="topic/test"/>
                     </jms-topic>
