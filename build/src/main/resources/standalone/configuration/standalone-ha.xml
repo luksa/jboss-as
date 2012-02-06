@@ -203,6 +203,7 @@
                 </replicated-cache>
             </cache-container>
             <cache-container name="capedwarf" default-cache="default">
+                <transport lock-timeout="60000"/>
                 <replicated-cache name="default" mode="ASYNC" batching="true" indexing="LOCAL">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="NONE"/>
