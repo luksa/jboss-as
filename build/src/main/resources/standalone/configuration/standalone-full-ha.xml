@@ -203,6 +203,21 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
+            <cache-container name="capedwarf" default-cache="default">
+                <transport lock-timeout="60000"/>
+                <replicated-cache name="default" mode="ASYNC" batching="true" indexing="LOCAL">
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="NONE"/>
+                </replicated-cache>
+                <replicated-cache name="data" mode="ASYNC">
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="NONE"/>
+                </replicated-cache>
+                <replicated-cache name="metadata" mode="ASYNC">
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="NONE"/>
+                </replicated-cache>
+            </cache-container>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jacorb:1.1">
             <orb>
@@ -384,6 +399,10 @@
                     <jms-queue name="testQueue">
                         <entry name="queue/test"/>
                         <entry name="java:jboss/exported/jms/queue/test"/>
+                    </jms-queue>
+                    <jms-queue name="capedwarfQueue">
+                        <entry name="queue/capedwarf"/>
+                        <entry name="java:jboss/exported/jms/queue/capedwarf"/>
                     </jms-queue>
                     <jms-topic name="testTopic">
                         <entry name="topic/test"/>
