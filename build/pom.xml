@@ -37,7 +37,7 @@
 
     <name>JBoss Application Server: Build</name>
     <packaging>pom</packaging>
-    
+
     <properties>
         <!-- generated configs root dirs -->
         <generated.configs>${basedir}/target/generated-configs</generated.configs>
@@ -101,7 +101,7 @@
                         <version>${version.rhino.js}</version>
                     </dependency>
                 </dependencies>
-            </plugin>    
+            </plugin>
         </plugins>
     </build>
 
@@ -1847,6 +1847,11 @@
                 <dependency>
                     <groupId>org.jboss.capedwarf.blue</groupId>
                     <artifactId>capedwarf-capabilities</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-channel</artifactId>
                 </dependency>
 
                 <dependency>
