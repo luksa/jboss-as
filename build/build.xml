@@ -209,7 +209,7 @@
         <module-def name="org.jboss.common-beans">
             <maven-resource group="org.jboss.common" artifact="jboss-common-beans"/>
         </module-def>
-    	
+
         <module-def name="org.jboss.common-core">
             <maven-resource group="org.jboss" artifact="jboss-common-core"/>
         </module-def>
@@ -978,6 +978,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-mail"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-memcache"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-oauth"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-search"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-tasks"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-urlfetch"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-users"/>

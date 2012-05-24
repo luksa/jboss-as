@@ -87,6 +87,16 @@
                        <property name="hibernate.search.default.worker.backend">jgroups</property>
                    </indexing-properties>
                </distributed-cache>
+               <distributed-cache name="search" mode="ASYNC" indexing="LOCAL">
+                   <transaction mode="NON_XA"/>
+                   <eviction strategy="NONE"/>
+                   <file-store preload="true" purge="false"/>
+                   <indexing-properties>
+                       <property name="hibernate.search.default.directory_provider">infinispan</property>
+                       <property name="hibernate.search.infinispan.cachemanager_jndiname">java:jboss/infinispan/container/HibernateSearch</property>
+                       <property name="hibernate.search.default.worker.backend">jgroups</property>
+                   </indexing-properties>
+               </distributed-cache>
                <replicated-cache name="data" mode="ASYNC">
                    <transaction mode="NON_XA"/>
                    <eviction strategy="NONE"/>

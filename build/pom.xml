@@ -831,7 +831,7 @@
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
                 </dependency>
-                
+
                 <dependency>
                     <groupId>org.jboss.common</groupId>
                     <artifactId>jboss-common-beans</artifactId>
@@ -1924,6 +1924,11 @@
 
                 <dependency>
                     <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-search</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
                     <artifactId>capedwarf-urlfetch</artifactId>
                 </dependency>
 
@@ -2020,7 +2025,7 @@
                                     <!-- To prevent problems with author names written in non-UTF-8:
                                     <encoding>ISO-8859-1</encoding>
                                     -->
-                                    
+
                                     <includeDependencySources>true</includeDependencySources>
                                     <dependencySourceIncludes>
                                         <include>com.h2database:*</include>
@@ -2034,7 +2039,7 @@
                                         <include>javax.mail:mail</include>
                                         <include>javax.validation:validation-api</include>
                                         <include>joda-time:joda-time</include>
-                                        
+
                                         <include>org.apache.juddi:juddi-client</include>
                                         <include>org.apache.juddi.scout:scout</include>
                                         <include>org.apache.juddi:uddi-ws</include>
@@ -2061,7 +2066,7 @@
                                         <include>org.jboss:jboss-remote-naming</include>
                                         <include>org.jboss.jbossts:jbosstxbridge</include>
 
-                                        <!--                                        
+                                        <!--
                                         <include>org.jboss.jbossts:jbossxts</include>
                                         <include>org.jboss.jbossts:jbossxts-api</include>
                                         -->
@@ -2075,7 +2080,7 @@
                                         <include>org.jboss.remotingjmx:remoting-jmx</include>
                                         <include>org.jboss.remoting3:jboss-remoting</include>
                                         <include>org.jboss.sasl:jboss-sasl</include>
-                                        
+
                                         <include>org.jboss.spec.javax.annotation:jboss-annotations-api_1.1_spec</include>
                                         <include>org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec</include>
                                         <include>org.jboss.spec.javax.el:jboss-el-api_2.2_spec</include>
@@ -2107,7 +2112,7 @@
                                         <include>org.jgroups:jgroups</include>
                                         <include>org.osgi:org.osgi.core</include>
                                         <include>org.picketbox:picketbox</include>
-                                        <!-- 
+                                        <!--
                                         <include>org.picketbox:picketbox-commons</include>
                                         -->
                                         <include>org.picketbox:picketbox-infinispan</include>
@@ -2126,7 +2131,7 @@
                                         <include>xalan:xalan</include>
                                         <include>xerces:xercesImpl</include>
                                     </dependencySourceIncludes>
-                                    
+
                                     <groups>
                                         <group>
                                             <title>Module org.apache.log4j</title>
@@ -3018,7 +3023,7 @@
                                         </group>
 
                                     </groups>
-                                    
+
                                 </configuration>
                             </execution>
                         </executions>
@@ -3026,8 +3031,8 @@
                 </plugins>
             </build>
         </profile>
-        
-        
+
+
     </profiles>
 
 </project>
