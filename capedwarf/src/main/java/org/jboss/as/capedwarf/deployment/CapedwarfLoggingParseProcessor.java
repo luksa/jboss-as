@@ -75,7 +75,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     try {
                         new PropertyConfigurator(logContext).configure(stream);
                     } finally {
-                        stream.close();
+                        safeClose(stream);
                     }
                     getContextSelector().registerLogContext(module.getClassLoader(), logContext);
                 } else {
