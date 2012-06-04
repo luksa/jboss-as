@@ -24,7 +24,7 @@ import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.LoaderConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
-import org.infinispan.configuration.parsing.Parser;
+import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.loaders.CacheLoader;
 import org.infinispan.loaders.CacheStore;
@@ -106,7 +106,7 @@ public abstract class CacheAdd extends AbstractAddStepHandler {
         log.debugf("Loading Infinispan defaults from %s", url.toString());
         try {
             InputStream input = url.openStream();
-            Parser parser = new Parser(Parser.class.getClassLoader());
+            ParserRegistry parser = new ParserRegistry(ParserRegistry.class.getClassLoader());
             try {
                 return parser.parse(input);
             } finally {
