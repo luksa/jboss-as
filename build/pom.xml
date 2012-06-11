@@ -112,6 +112,11 @@
             <artifactId>log4j</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers</artifactId>
+        </dependency>
+
         <!-- TODO: why do we need jandex in minimal? -->
         <dependency>
             <groupId>org.jboss</groupId>
