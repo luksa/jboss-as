@@ -117,6 +117,11 @@
             <artifactId>lucene-analyzers</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-memory</artifactId>
+        </dependency>
+
         <!-- TODO: why do we need jandex in minimal? -->
         <dependency>
             <groupId>org.jboss</groupId>
@@ -1925,6 +1930,11 @@
                 <dependency>
                     <groupId>org.jboss.capedwarf.blue</groupId>
                     <artifactId>capedwarf-oauth</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.capedwarf.blue</groupId>
+                    <artifactId>capedwarf-prospectivesearch</artifactId>
                 </dependency>
 
                 <dependency>
